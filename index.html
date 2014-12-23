@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Highchess by Jon Arild Nygård</title>
+	<script type="text/javascript" src="http://code.jquery.com/jquery-1.11.0.js"></script>
+	<script type="text/javascript" src="http://code.highcharts.com/4.0.4/highcharts.src.js"></script>
+	<script type="text/javascript" src="src/chess.js"></script>
+	<script type="text/javascript">
+		jQuery(document).ready(function() {
+			var chart = new Highcharts.Chart({
+			    chart: {
+			        renderTo: 'container'
+			    },
+			    series: [{
+			    	type: "chess",
+			    	data: []
+			    }],
+			    title: {
+			    	text: "Chess"
+			    }
+			});
+		});
+	</script>
+</head>
+<body>
+	<h1>Highchess</h1>
+	<div id="container"></div>
+</body>
+</html>
