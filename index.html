@@ -9,10 +9,16 @@
 		jQuery(document).ready(function() {
 			var chart = new Highcharts.Chart({
 			    chart: {
-			        renderTo: 'container'
+			        renderTo: 'container',
+			        width: 400,
+			        height: 400
 			    },
 			    series: [{
 			    	type: "chess",
+			    	board: {
+			    		dark: "#206629",
+			    		light: "white"
+			    	},
 			    	data: []
 			    }],
 			    title: {
