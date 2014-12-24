@@ -10,7 +10,7 @@
 
     /* Default plotting options */
     plotOptions.chess = merge(plotOptions.scatter, {
-
+        showInLegend: false
     });
     
     /* Series functions */
@@ -64,7 +64,7 @@
                 maxPadding: 0,
                 startOnTick: false,
                 title: null,
-                // tickPositions: []
+                tickPositions: []
             };
             Series.prototype.bindAxes.call(this);
             H.extend(this.yAxis.options, chessAxis);
