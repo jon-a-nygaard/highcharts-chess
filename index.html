@@ -3,7 +3,7 @@
 <head>
 	<title>Highchess by Jon Arild Nygård</title>
 	<script type="text/javascript" src="http://code.jquery.com/jquery-1.11.0.js"></script>
-	<script type="text/javascript" src="http://code.highcharts.com/4.0.4/highcharts.src.js"></script>
+	<script type="text/javascript" src="http://code.highcharts.local/highcharts.js?12"></script>
 	<script type="text/javascript" src="src/chess.js"></script>
 	<script type="text/javascript">
 		jQuery(document).ready(function() {
@@ -17,9 +17,21 @@
 			    	type: "chess",
 			    	board: {
 			    		dark: "#206629",
-			    		light: "white"
+			    		light: "white",
+			    		white: {
+			    			fill: "#FFFFFF",
+			    			border: "#000000"
+			    		},
+			    		black: {
+			    			fill: "#000000",
+			    			border: "#FFFFFF"
+			    		}
 			    	},
-			    	data: []
+			    	data: [{
+			    		player: "White",
+			    		position: "A3",
+			    		piece: "Rook"
+			    	}]
 			    }],
 			    title: {
 			    	text: "Chess"
