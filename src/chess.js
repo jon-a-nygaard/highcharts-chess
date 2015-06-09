@@ -14,6 +14,10 @@
             align: 'center',
             enabled: true,
             verticalAlign: 'middle',
+            useHTML: true,
+            style: {
+            	"fontSize": "35px"
+            },
             // verticalAlign: 'middle',
             formatter: function () {
                 return this.point.piece;
@@ -81,7 +85,8 @@
                             "D": 7,
                             "E": 9,
                             "F": 11,
-                            "H": 13
+                            "G": 13,
+                            "H": 15
                         },
                         x = arr[pos.charAt(0)];
                         return x;
