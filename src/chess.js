@@ -11,17 +11,7 @@
     /* Default plotting options */
     plotOptions.chess = merge(plotOptions.scatter, {
         dataLabels: {
-            align: 'center',
-            enabled: true,
-            verticalAlign: 'middle',
-            useHTML: true,
-            style: {
-            	"fontSize": "35px"
-            },
-            // verticalAlign: 'middle',
-            formatter: function () {
-                return this.point.piece;
-            }
+            enabled: false,
         },
         marker: {
             radius: 15
@@ -74,6 +64,16 @@
                 fill = fill === light ? dark : light;
             }            
         },
+        setDefaultSymbols: function () {
+        	var data = this.options.data,
+        		url;
+        	each(data, function (d) {
+				url = "url(icons/" + d.player.toLowerCase() + "_" + d.piece.toLowerCase() + ".png)";
+				d.marker = {
+					symbol: url
+				};
+        	});
+        },
         setPointValues: function () {
             var series = this,
                 points = series.points,
@@ -108,6 +108,7 @@
             });
         },
         translate: function () {
+        	this.setDefaultSymbols();
             // Call original translate to generate points, so we can work with them.
             // @todo setPointValues on the data instead of working with points, then this is is 
             Series.prototype.translate.call(this);
