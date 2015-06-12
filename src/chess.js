@@ -28,36 +28,60 @@
     seriesTypes.chess = extendClass(seriesTypes.scatter, merge({
         type: "chess",
         /**
+         * Creates a single rectangle, representing one board square, and returns the created element.
+         * @param string fill The color of the square.
+         * @param Number x The starting x position of the square.
+         * @param Number y The starting y position of the square.
+         * @param Number length The length of the sides on the square.
+         * @return Element Returns a Highcharts Element.
+         */
+        addBoardSquare: function (fill, x, y, length) {
+            var series = this,
+                xAxis = series.xAxis,
+                yAxis = series.yAxis,
+                x1 = xAxis.left + Math.round(xAxis.translate(x, 0, 0, 0, 1)),
+                x2 = xAxis.left + Math.round(xAxis.translate(x + length, 0, 0, 0, 1)),
+                y1 = xAxis.top + Math.round(yAxis.translate(y, 0, 0, 0, 1)),
+                y2 = xAxis.top + Math.round(yAxis.translate(y + length, 0, 0, 0, 1)),
+                renderer = series.chart.renderer,
+                element = renderer.rect(x1, y1, x2 - x1, y2 - y1, 0)
+                .attr({
+                    fill: fill,
+                    zIndex: 0
+                }).add();
+                return element;
+        },
+        addClickToMove: function (element, file, rank) {
+            var series = this;
+            element.on("click", function () {
+                series.selected.position = series.columns[file] + rank;
+                series.isDirty = true;
+                series.chart.redraw();
+            });
+        },
+        columns: ["A", "B", "C", "D", "E", "F", "G", "H"],
+        /**
         * Draws all the rectangles for the chess board
         * @todo: add shapes to new group. set board size in options.
         */
         drawChessBoard: function () {
             var series = this,
-                renderer = series.chart.renderer,
-                fill,
-                xAxis = series.xAxis,
-                yAxis = series.yAxis,
                 board = series.options.board,
-                x = 0,
-                y = 0,
                 dark = board.dark,
                 light = board.light,
-                len = 2,
-                x1, x2, y1, y2;
+                fill,
+                x = 0,
+                y = 0,
+                len = 2;
 
-            for (var i = 1; i <= 8; i++) {
-                for (var j = 1; j <= 8; j++) {
-                    x1 = xAxis.left + Math.round(xAxis.translate(x, 0, 0, 0, 1));
-                    x2 = xAxis.left + Math.round(xAxis.translate(x + len, 0, 0, 0, 1));
-                    y1 = xAxis.top + Math.round(yAxis.translate(y, 0, 0, 0, 1));
-                    y2 = xAxis.top + Math.round(yAxis.translate(y + len, 0, 0, 0, 1));
+            for (var i = 8; i > 0; i--) {
+                for (var j = 0; j < 8; j++) {
                     fill = fill === light ? dark : light;
-                    renderer.rect(x1, y1, x2 - x1, y2 - y1, 0)
-                    .attr({
-                        fill: fill,
-                        zIndex: 0
-                    }).add();
-                    x += len;    
+                    square = series.addBoardSquare(fill, x, y, len);
+                    x += len;
+                    if (series.selected) {
+                        series.addClickToMove(square, j, i);
+                    }
                 }
                 y += len;
                 x = 0;
@@ -105,6 +129,12 @@
                 };
                 point.plotX = point.shapeArgs.x;
                 point.plotY = point.shapeArgs.y;
+                H.removeEvent(point, "click.select");    
+                H.addEvent(point, "click.select", function () {
+                    series.selected = point;
+                    series.isDirty = true; // Force redraw
+                    series.chart.redraw();
+                });
             });
         },
         translate: function () {
