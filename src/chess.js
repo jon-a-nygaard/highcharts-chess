@@ -88,13 +88,24 @@
                 fill = fill === light ? dark : light;
             }            
         },
+        /**
+         * Loops over all data and adds a default symbol marker.
+         * @todo Let the users override both symbol sizes and url.
+         */
         setDefaultSymbols: function () {
         	var data = this.options.data,
-        		url;
+        		url,
+                xAxis = this.xAxis,
+                yAxis = this.yAxis,
+                width = xAxis.translate(2, 0, 0, 0, 1) - xAxis.translate(0, 0, 0, 0, 1),
+                height = yAxis.translate(2, 0, 0, 0, 1) - yAxis.translate(0, 0, 0, 0, 1),
+                size = width > height ? height : width;
         	each(data, function (d) {
 				url = "url(icons/" + d.player.toLowerCase() + "_" + d.piece.toLowerCase() + ".png)";
 				d.marker = {
-					symbol: url
+					symbol: url,
+                    width: size,
+                    height: size
 				};
         	});
         },
