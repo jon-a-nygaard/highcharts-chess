@@ -1,6 +1,10 @@
+// Highcharts needs an adapter.
+// @todo Remove when Highcharts has better support for Node.
+window.jQuery = require('jquery');
+// Load Highcharts. Highcharts is added to the window object.
+// @todo Assign to variable, when Highcharts returns to module.exports.
 require('highcharts-release/highcharts.js');
-/*global HighchartsAdapter */
-(function (H) {
+(function (H, A) {
 	var defaultOptions = H.getOptions(),
 		each = H.each,
 		extendClass = H.extendClass,
@@ -181,4 +185,4 @@ require('highcharts-release/highcharts.js');
 	if (typeof module === "object" && typeof module.exports === "object") {
 		module.exports = H;
 	}
-}(Highcharts));
+}(Highcharts, HighchartsAdapter));

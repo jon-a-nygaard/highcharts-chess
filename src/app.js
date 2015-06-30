@@ -1,4 +1,4 @@
-var jQuery = window.jQuery = require('jquery'),
+var jQuery = require('jquery'),
 	chess = require('./chess.js'),
 	positions = require('./defaultData.js');
 jQuery(document).ready(function () {
