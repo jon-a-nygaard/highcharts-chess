@@ -1,3 +1,4 @@
+require('highcharts-release/highcharts.js');
 /*global HighchartsAdapter */
 (function (H) {
 	var defaultOptions = H.getOptions(),
@@ -176,4 +177,8 @@
 		}
 	}));
 
+	// Return Highcharts object to node
+	if (typeof module === "object" && typeof module.exports === "object") {
+		module.exports = H;
+	}
 }(Highcharts));
