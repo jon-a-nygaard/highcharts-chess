@@ -2,46 +2,7 @@
 <html>
 <head>
 	<title>Highchess by Jon Arild Nygård</title>
-	<script type="text/javascript" src="http://code.jquery.com/jquery-1.11.0.js"></script>
-	<script type="text/javascript" src="http://code.highcharts.local/highcharts.js?12"></script>
-	<script type="text/javascript" src="src/chess.js"></script>
-	<script type="text/javascript" src="src/defaultData.js"></script>
-	<script type="text/javascript">
-		jQuery(document).ready(function() {
-			var chart = new Highcharts.Chart({
-				chart: {
-					animation: false,
-					renderTo: 'container',
-					width: 400,
-					height: 400,
-					plotBorderWidth: 1,
-					plotBorderColor: '#000000'
-				},
-				series: [{
-					type: "chess",
-					board: {
-						dark: "#206629",
-						light: "white",
-						white: {
-							fill: "#FFFFFF",
-							border: "#000000"
-						},
-						black: {
-							fill: "#000000",
-							border: "#FFFFFF"
-						}
-					},
-					data: HighchessData
-				}],
-				title: {
-					text: "Chess made with Highcharts"
-				},
-				tooltip: {
-					enabled: false
-				}
-			});
-		});
-	</script>
+	<script type="text/javascript" src="dist/app.min.js"></script>
 </head>
 <body>
 	<h1>Highchess</h1>
