@@ -1,6 +1,5 @@
 var jQuery = require('jquery'),
-	chess = require('./chess.js'),
-	positions = require('./defaultData.js');
+	chess = require('./chess.js');
 jQuery(document).ready(function () {
 	var chart = new chess.Chart({
 		chart: {
@@ -24,8 +23,7 @@ jQuery(document).ready(function () {
 					fill: "#000000",
 					border: "#FFFFFF"
 				}
-			},
-			data: positions
+			}
 		}],
 		title: {
 			text: "Chess made with Highcharts"

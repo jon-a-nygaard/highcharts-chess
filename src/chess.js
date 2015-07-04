@@ -3,9 +3,10 @@
 window.jQuery = require('jquery');
 // Load Highcharts. Highcharts is added to the window object.
 // @todo Assign to variable, when Highcharts returns to module.exports.
-require('highcharts-release/highcharts.js');
+require('highcharts-release/highcharts.src.js');
 (function (H, A) {
-	var defaultOptions = H.getOptions(),
+	var Chess = require('chess.js').Chess,
+		defaultOptions = H.getOptions(),
 		each = H.each,
 		extendClass = H.extendClass,
 		merge = H.merge,
@@ -64,34 +65,57 @@ require('highcharts-release/highcharts.js');
 				series.chart.redraw();
 			});
 		},
-		columns: ["A", "B", "C", "D", "E", "F", "G", "H"],
+		addPiece: function (pos, obj) {
+			var series = this,
+				data = series.options.data,
+				piece = {
+					color: obj.color,
+					position: pos,
+					type: obj.type
+				};
+			data.push(piece);
+		},
+		columns: ["a", "b", "c", "d", "e", "f", "g", "h"],
+		columnsToPosition: { "a": 1, "b": 3, "c": 5, "d": 7, "e": 9, "f": 11, "g": 13, "h": 15 },
 		/**
 		* Draws all the rectangles for the chess board
 		* @todo: add shapes to new group. set board size in options.
 		*/
 		drawChessBoard: function () {
 			var series = this,
+				validation = series.validation,
 				board = series.options.board,
 				dark = board.dark,
 				light = board.light,
 				fill,
+				pos,
 				x = 0,
 				y = 0,
 				len = 2;
-
-			for (var i = 8; i > 0; i--) {
-				for (var j = 0; j < 8; j++) {
+			for (var rank = 8; rank > 0; rank--) {
+				for (var file = 0; file < 8; file++) {
 					fill = fill === light ? dark : light;
 					square = series.addBoardSquare(fill, x, y, len);
 					x += len;
-					if (series.selected) {
-						series.addClickToMove(square, j, i);
+					pos = series.getPosition(file, rank);
+					piece = validation.get(pos);
+					if (piece) {
+						series.addPiece(pos, piece);
 					}
 				}
 				y += len;
 				x = 0;
 				fill = fill === light ? dark : light;
-			}            
+			}
+			// Set the data
+			// @todo Find a way to set data, before Series.processData is called.
+			series.setData(series.options.data, false);          
+		},
+		/**
+		 *
+		 */
+		getPosition: function (file, rank) {
+			return this.columns[file] + rank;
 		},
 		/**
 		 * Loops over all data and adds a default symbol marker.
@@ -106,7 +130,7 @@ require('highcharts-release/highcharts.js');
 				height = yAxis.translate(2, 0, 0, 0, 1) - yAxis.translate(0, 0, 0, 0, 1),
 				size = width > height ? height : width;
 			each(data, function (d) {
-				url = "url(icons/" + d.player.toLowerCase() + "_" + d.piece.toLowerCase() + ".png)";
+				url = "url(icons/" + d.color + "_" + d.type + ".png)";
 				d.marker = {
 					symbol: url,
 					width: size,
@@ -118,17 +142,7 @@ require('highcharts-release/highcharts.js');
 			var series = this,
 				points = series.points,
 				getXValue = function (pos) {
-					var arr = {
-							"A": 1,
-							"B": 3,
-							"C": 5,
-							"D": 7,
-							"E": 9,
-							"F": 11,
-							"G": 13,
-							"H": 15
-						},
-						x = arr[pos.charAt(0)];
+					var x = series.columnsToPosition[pos.charAt(0)];
 						return x;
 				},
 				getYValue = function (pos) {
@@ -145,20 +159,18 @@ require('highcharts-release/highcharts.js');
 				};
 				point.plotX = point.shapeArgs.x;
 				point.plotY = point.shapeArgs.y;
-				H.removeEvent(point, "click.select");    
-				H.addEvent(point, "click.select", function () {
-					series.selected = point;
-					series.isDirty = true; // Force redraw
-					series.chart.redraw();
-				});
 			});
 		},
 		translate: function () {
+			if (!this.validation) {
+				// Initialize the game tracker
+				this.validation = new Chess();
+				this.drawChessBoard();
+			}
 			this.setDefaultSymbols();
 			// Call original translate to generate points, so we can work with them.
 			// @todo setPointValues on the data instead of working with points, then this is is 
 			Series.prototype.translate.call(this);
-			this.drawChessBoard();
 			this.setPointValues();
 			Series.prototype.translate.call(this); // Call again to set correct point values
 		},
