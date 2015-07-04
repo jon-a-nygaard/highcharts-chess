@@ -41,14 +41,16 @@ require('highcharts-release/highcharts.src.js');
 		 * @param Number length The length of the sides on the square.
 		 * @return Element Returns a Highcharts Element.
 		 */
-		addBoardSquare: function (fill, x, y, length) {
+		addBoardSquare: function (fill, pos) {
 			var series = this,
 				xAxis = series.xAxis,
 				yAxis = series.yAxis,
-				x1 = xAxis.left + Math.round(xAxis.translate(x, 0, 0, 0, 1)),
-				x2 = xAxis.left + Math.round(xAxis.translate(x + length, 0, 0, 0, 1)),
-				y1 = xAxis.top + Math.round(yAxis.translate(y, 0, 0, 0, 1)),
-				y2 = xAxis.top + Math.round(yAxis.translate(y + length, 0, 0, 0, 1)),
+				x = series.getXFromPosition(pos),
+				y = series.getYFromPosition(pos),
+				x1 = xAxis.left + Math.round(xAxis.translate(x - 1, 0, 0, 0, 1)),
+				x2 = xAxis.left + Math.round(xAxis.translate(x + 1, 0, 0, 0, 1)),
+				y1 = xAxis.top + Math.round(yAxis.translate(y - 1, 0, 0, 0, 1)),
+				y2 = xAxis.top + Math.round(yAxis.translate(y + 1, 0, 0, 0, 1)),
 				renderer = series.chart.renderer,
 				element = renderer.rect(x1, y1, x2 - x1, y2 - y1, 0)
 				.attr({
@@ -76,7 +78,6 @@ require('highcharts-release/highcharts.src.js');
 			data.push(piece);
 		},
 		columns: ["a", "b", "c", "d", "e", "f", "g", "h"],
-		columnsToPosition: { "a": 1, "b": 3, "c": 5, "d": 7, "e": 9, "f": 11, "g": 13, "h": 15 },
 		/**
 		* Draws all the rectangles for the chess board
 		* @todo: add shapes to new group. set board size in options.
@@ -88,23 +89,17 @@ require('highcharts-release/highcharts.src.js');
 				dark = board.dark,
 				light = board.light,
 				fill,
-				pos,
-				x = 0,
-				y = 0,
-				len = 2;
+				pos;
 			for (var rank = 8; rank > 0; rank--) {
 				for (var file = 0; file < 8; file++) {
 					fill = fill === light ? dark : light;
-					square = series.addBoardSquare(fill, x, y, len);
-					x += len;
 					pos = series.getPosition(file, rank);
+					square = series.addBoardSquare(fill, pos);
 					piece = validation.get(pos);
 					if (piece) {
 						series.addPiece(pos, piece);
 					}
 				}
-				y += len;
-				x = 0;
 				fill = fill === light ? dark : light;
 			}
 			// Set the data
@@ -112,10 +107,30 @@ require('highcharts-release/highcharts.src.js');
 			series.setData(series.options.data, false);          
 		},
 		/**
-		 *
+		 * Returns the position on the board from a file and rank number.
+		 * @param Number file The number of file.
+		 * @param Number rank The number of rank.
+		 * @return String The board position. 
 		 */
 		getPosition: function (file, rank) {
 			return this.columns[file] + rank;
+		},
+		/**
+		 * Returns the X value of a board position.
+		 * @param String pos The board position.
+		 * @return Number The X value.
+		 */
+		getXFromPosition: function (pos) {
+			var columnsToPosition = { "a": 1, "b": 3, "c": 5, "d": 7, "e": 9, "f": 11, "g": 13, "h": 15 };
+			return columnsToPosition[pos.charAt(0)];
+		},
+		/**
+		 * Returns the Y value of a board position.
+		 * @param String pos The board position.
+		 * @return Number The Y value.
+		 */
+		getYFromPosition: function (pos) {
+			return 2 * +pos.charAt(1) - 1;
 		},
 		/**
 		 * Loops over all data and adds a default symbol marker.
@@ -140,19 +155,11 @@ require('highcharts-release/highcharts.src.js');
 		},
 		setPointValues: function () {
 			var series = this,
-				points = series.points,
-				getXValue = function (pos) {
-					var x = series.columnsToPosition[pos.charAt(0)];
-						return x;
-				},
-				getYValue = function (pos) {
-					var y = 2 * +pos.charAt(1) - 1;
-					return y;
-				};
+				points = series.points;
 			each(points, function (point) {
 				point.shapeType = "circle";
-				point.x = getXValue(point.position);
-				point.y = getYValue(point.position);
+				point.x = series.getXFromPosition(point.position);
+				point.y = series.getYFromPosition(point.position);
 				point.shapeArgs = {
 					x: Math.round(series.xAxis.translate(point.x, 0, 0, 0, 1)),
 					y: Math.round(series.yAxis.translate(point.y, 0, 0, 0, 1)),
