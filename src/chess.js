@@ -142,6 +142,7 @@ require('highcharts-release/highcharts.src.js');
 		 */
 		getBoardPositions: function () {
 			var series = this,
+				pos,
 				positions = [];
 			for (var rank = 8; rank > 0; rank--) {
 				for (var file = 0; file < 8; file++) {
