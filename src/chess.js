@@ -49,22 +49,53 @@ require('highcharts-release/highcharts.src.js');
 				y = series.getYFromPosition(pos),
 				x1 = xAxis.left + Math.round(xAxis.translate(x - 1, 0, 0, 0, 1)),
 				x2 = xAxis.left + Math.round(xAxis.translate(x + 1, 0, 0, 0, 1)),
-				y1 = xAxis.top + Math.round(yAxis.translate(y - 1, 0, 0, 0, 1)),
-				y2 = xAxis.top + Math.round(yAxis.translate(y + 1, 0, 0, 0, 1)),
+				y1 = xAxis.top + Math.round(yAxis.translate(16 - y - 1, 0, 0, 0, 1)),
+				y2 = xAxis.top + Math.round(yAxis.translate(16 - y + 1, 0, 0, 0, 1)),
 				renderer = series.chart.renderer,
 				element = renderer.rect(x1, y1, x2 - x1, y2 - y1, 0)
 				.attr({
 					fill: fill,
-					zIndex: 0
+					zIndex: 0,
+					"data-pos": pos
 				}).add();
 				return element;
 		},
-		addClickToMove: function (element, file, rank) {
-			var series = this;
+		addClickToPiece: function (piece) {
+			var series = this,
+				validMoves = series.validMoves;
+			if (!piece.events) {
+				piece.events = {};
+			}
+			piece.events.click = function () {
+				if (series.selected) {
+					if (series.selected === this) {
+						delete series.selected;
+					} else if (validMoves.indexOf(this.position)) {
+
+					}
+				} else {
+					series.selected = this;
+					series.validMoves = series.validation.moves({ square: this.position });
+					series.isDirty = true;
+					series.chart.redraw();
+				}
+			};
+		},
+		addClickToSquare: function (element, pos) {
+			var series = this,
+				validation = series.validation,
+				point;
 			element.on("click", function () {
-				series.selected.position = series.columns[file] + rank;
-				series.isDirty = true;
-				series.chart.redraw();
+				point = series.selected;
+				if (series.validMoves.indexOf(pos)) {
+					validation.move({
+						from: series.selected.position,
+						to: pos
+					});
+					delete series.selected;
+					series.isDirty = true;
+					series.chart.redraw();
+				}
 			});
 		},
 		addPiece: function (pos, obj) {
@@ -76,6 +107,7 @@ require('highcharts-release/highcharts.src.js');
 					type: obj.type
 				};
 			data.push(piece);
+			return piece;
 		},
 		columns: ["a", "b", "c", "d", "e", "f", "g", "h"],
 		/**
@@ -89,15 +121,21 @@ require('highcharts-release/highcharts.src.js');
 				dark = board.dark,
 				light = board.light,
 				fill,
+				point,
 				pos;
 			for (var rank = 8; rank > 0; rank--) {
 				for (var file = 0; file < 8; file++) {
 					fill = fill === light ? dark : light;
 					pos = series.getPosition(file, rank);
+					if (series.selected && series.selected.position === pos) {
+						fill = "red";
+					}
 					square = series.addBoardSquare(fill, pos);
+					series.addClickToSquare(square, pos);
 					piece = validation.get(pos);
 					if (piece) {
-						series.addPiece(pos, piece);
+						point = series.addPiece(pos, piece);
+						series.addClickToPiece(point);
 					}
 				}
 				fill = fill === light ? dark : light;
@@ -172,8 +210,8 @@ require('highcharts-release/highcharts.src.js');
 			if (!this.validation) {
 				// Initialize the game tracker
 				this.validation = new Chess();
-				this.drawChessBoard();
 			}
+			this.drawChessBoard();
 			this.setDefaultSymbols();
 			// Call original translate to generate points, so we can work with them.
 			// @todo setPointValues on the data instead of working with points, then this is is 
