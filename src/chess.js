@@ -117,31 +117,39 @@ require('highcharts-release/highcharts.src.js');
 		drawChessBoard: function () {
 			var series = this,
 				validation = series.validation,
-				board = series.options.board,
-				dark = board.dark,
-				light = board.light,
 				fill,
-				point,
-				pos;
-			for (var rank = 8; rank > 0; rank--) {
-				for (var file = 0; file < 8; file++) {
-					pos = series.getPosition(file, rank);
-					fill = series.getFillFromPosition(pos);
-					if (series.selected && series.selected.position === pos) {
-						fill = "red";
-					}
-					square = series.addBoardSquare(fill, pos);
-					series.addClickToSquare(square, pos);
-					piece = validation.get(pos);
-					if (piece) {
-						point = series.addPiece(pos, piece);
-						series.addClickToPiece(point);
-					}
+				point;
+			each(series.boardPositions, function (pos) {
+				fill = series.getFillFromPosition(pos);
+				if (series.selected && series.selected.position === pos) {
+					fill = "red";
 				}
-			}
+				square = series.addBoardSquare(fill, pos);
+				series.addClickToSquare(square, pos);
+				piece = validation.get(pos);
+				if (piece) {
+					point = series.addPiece(pos, piece);
+					series.addClickToPiece(point);
+				}
+			});
 			// Set the data
 			// @todo Find a way to set data, before Series.processData is called.
 			series.setData(series.options.data, false);          
+		},
+		/**
+		 * Returns an array of all square positions on the board.
+		 * @return {String[]} The positions.
+		 */
+		getBoardPositions: function () {
+			var series = this,
+				positions = [];
+			for (var rank = 8; rank > 0; rank--) {
+				for (var file = 0; file < 8; file++) {
+					pos = series.getPosition(file, rank);
+					positions.push(pos);
+				}
+			}
+			return positions;
 		},
 		/**
 		 * Returns the dark or light fill color of a square, based upon its position.
@@ -222,6 +230,7 @@ require('highcharts-release/highcharts.src.js');
 			if (!this.validation) {
 				// Initialize the game tracker
 				this.validation = new Chess();
+				this.boardPositions = this.getBoardPositions();
 			}
 			this.drawChessBoard();
 			this.setDefaultSymbols();
