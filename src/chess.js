@@ -5,7 +5,8 @@ window.jQuery = require('jquery');
 // @todo Assign to variable, when Highcharts returns to module.exports.
 require('highcharts-release/highcharts.src.js');
 (function (H, A) {
-	var Chess = require('chess.js').Chess,
+	var any,
+		Chess = require('chess.js').Chess,
 		defaultOptions = H.getOptions(),
 		each = H.each,
 		extendClass = H.extendClass,
@@ -13,6 +14,27 @@ require('highcharts-release/highcharts.src.js');
 		plotOptions = defaultOptions.plotOptions,
 		Series = H.Series,
 		seriesTypes = H.seriesTypes;
+
+	/**
+	 * Returns true if any item in a collection matches a given predicate.
+	 * Inspired by Underscore.js _.any function.
+	 * @param {Mixed[]} Collection to look in.
+	 * @param {Function} Predicate to control.
+	 * @returns {Bool} True if any item in the collection matches the predicate.
+	 * @todo Only works for arrays, should modif to work with objects
+	 */
+	any = function (obj, predicate) {
+		var found = false,
+			result;
+		H.each(obj, function (item) {
+			result = predicate(item);
+			if (result) {
+				found = true;
+				// @todo break the loop.
+			}
+		});
+		return found;
+	}
 
 	/* Default plotting options */
 	plotOptions.chess = merge(plotOptions.scatter, {
@@ -66,12 +88,17 @@ require('highcharts-release/highcharts.src.js');
 				if (series.selected) {
 					if (series.selected === this.position) {
 						delete series.selected;
+						delete series.validMoves;
 					} else {
 						// Move selected to this position, if it is a valid move.
 						series.move(this.position);
 					}
 				} else {
 					series.selected = this.position;
+					series.validMoves = series.validation.moves({
+						square: series.selected,
+						verbose: true
+					});
 				}
 				series.isDirty = true;
 				series.chart.redraw();
@@ -106,6 +133,7 @@ require('highcharts-release/highcharts.src.js');
 		drawChessBoard: function () {
 			var series = this,
 				validation = series.validation,
+				validMoves = series.validMoves,
 				width = series.xAxis.translate(2, 0, 0, 0, 1) - series.xAxis.translate(0, 0, 0, 0, 1),
 				height = series.yAxis.translate(2, 0, 0, 0, 1) - series.yAxis.translate(0, 0, 0, 0, 1),
 				size = width > height ? height : width,
@@ -113,9 +141,15 @@ require('highcharts-release/highcharts.src.js');
 				data = [],
 				point;
 			each(series.boardPositions, function (pos) {
-				fill = series.getFillFromPosition(pos);
+				validMove = validMoves && any(validMoves, function (move) {
+					return move.to === pos;
+				});
 				if (series.selected === pos) {
-					fill = "red";
+					fill = (series.options.board.selected ? series.options.board.selected : series.getFillFromPosition(pos));
+				} else if (validMove) {
+					fill = series.options.board.moves;
+				} else {
+					fill = series.getFillFromPosition(pos);
 				}
 				square = series.addBoardSquare(fill, pos);
 				series.addClickToSquare(square, pos);
@@ -199,6 +233,7 @@ require('highcharts-release/highcharts.src.js');
 					// @todo Remove logging before release
 					console.log(validation.ascii());
 					delete series.selected;
+					delete series.validMoves;
 					series.isDirty = true;
 					series.chart.redraw();
 				}

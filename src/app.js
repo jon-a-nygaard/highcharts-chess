@@ -13,16 +13,11 @@ jQuery(document).ready(function () {
 		series: [{
 			type: "chess",
 			board: {
-				dark: "#206629",
-				light: "white",
-				white: {
-					fill: "#FFFFFF",
-					border: "#000000"
-				},
-				black: {
-					fill: "#000000",
-					border: "#FFFFFF"
-				}
+				// Palette: http://paletton.com/#uid=101050kp5mHv9gRrOjYlRp9ios2
+				dark: "#9F1815",
+				light: "#B52B27",
+				selected: false,
+				moves: "#DF625F"
 			}
 		}],
 		title: {
