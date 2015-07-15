@@ -85,30 +85,15 @@ require('highcharts-release/highcharts.src.js');
 				piece.events = {};
 			}
 			piece.events.click = function () {
-				if (series.selected) {
-					if (series.selected === this.position) {
-						delete series.selected;
-						delete series.validMoves;
-					} else {
-						// Move selected to this position, if it is a valid move.
-						series.move(this.position);
-					}
-				} else {
-					series.selected = this.position;
-					series.validMoves = series.validation.moves({
-						square: series.selected,
-						verbose: true
-					});
-				}
-				series.isDirty = true;
-				series.chart.redraw();
+				series.doClickAction(this.position, this.color);
 			};
 		},
 		addClickToSquare: function (element, pos) {
 			var series = this;
 			element.on("click", function () {
-				// Move selected to this position, if it is a valid move.
-				series.move(pos);
+				var piece = series.validation.get({ square: pos }),
+					color = (piece ? piece.color : undefined);
+				series.doClickAction(pos, color);
 			});
 		},
 		addPiece: function (pos, obj, size) {
@@ -126,6 +111,26 @@ require('highcharts-release/highcharts.src.js');
 			return piece;
 		},
 		columns: ["a", "b", "c", "d", "e", "f", "g", "h"],
+		doClickAction: function (pos, color) {
+			var series = this,
+				validMove,
+				validMoves = series.validMoves;
+			validMove = validMoves && any(validMoves, function (move) {
+				return move.to === pos;
+			});
+			if (series.selected === pos) {
+				series.removeSelected();
+			} else if (series.validation.turn() === color) {
+				series.setSelected(pos);
+			} else if (validMove) {
+				// Move selected to this position, if it is a valid move.
+				series.move(pos);
+			} else {
+				series.removeSelected();
+			}
+			series.isDirty = true;
+			series.chart.redraw();
+		},
 		/**
 		* Draws all the rectangles for the chess board
 		* @todo: add shapes to new group. set board size in options.
@@ -230,14 +235,13 @@ require('highcharts-release/highcharts.src.js');
 					to: pos
 				});
 				if (moved) {
-					// @todo Remove logging before release
-					console.log(validation.ascii());
-					delete series.selected;
-					delete series.validMoves;
-					series.isDirty = true;
-					series.chart.redraw();
+					series.removeSelected();
 				}
 			}
+		},
+		removeSelected: function () {
+			delete this.selected;
+			delete this.validMoves;
 		},
 		setPointValues: function () {
 			var series = this,
@@ -252,6 +256,13 @@ require('highcharts-release/highcharts.src.js');
 				};
 				point.plotX = point.shapeArgs.x;
 				point.plotY = point.shapeArgs.y;
+			});
+		},
+		setSelected: function (pos) {
+			this.selected = pos;
+			this.validMoves = this.validation.moves({
+				square: this.selected,
+				verbose: true
 			});
 		},
 		translate: function () {
