@@ -19,9 +19,6 @@ require('highcharts-release/highcharts.src.js');
 		dataLabels: {
 			enabled: false,
 		},
-		marker: {
-			radius: 15
-		},
 		states: {
 			hover: {
 				enabled: false
