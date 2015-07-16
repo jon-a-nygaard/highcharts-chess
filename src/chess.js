@@ -123,18 +123,13 @@ require('highcharts-release/highcharts.src.js');
 		},
 		/**
 		* Draws all the rectangles for the chess board
-		* @todo: add shapes to new group. set board size in options.
+		* @todo: set board size in options.
 		*/
 		drawChessBoard: function () {
 			var series = this,
 				board = series.board,
 				validation = series.validation,
-				width = series.xAxis.translate(2, 0, 0, 0, 1) - series.xAxis.translate(0, 0, 0, 0, 1),
-				height = series.yAxis.translate(2, 0, 0, 0, 1) - series.yAxis.translate(0, 0, 0, 0, 1),
-				size = width > height ? height : width,
-				square,
-				data = [],
-				point;
+				square;
 			if (!board) {
 				board = series.board = [];
 				each(series.boardPositions, function (pos) {
@@ -148,7 +143,18 @@ require('highcharts-release/highcharts.src.js');
 				if (series.options.interactive) {
 					series.addClickToSquare(board[pos], pos);
 				}
-				// @todo Extract piece logic into a seperate function.
+			}
+		},
+		drawChessPieces: function () {
+			var series = this,
+				validation = series.validation,
+				width = series.xAxis.translate(2, 0, 0, 0, 1) - series.xAxis.translate(0, 0, 0, 0, 1),
+				height = series.yAxis.translate(2, 0, 0, 0, 1) - series.yAxis.translate(0, 0, 0, 0, 1),
+				size = width > height ? height : width,				
+				data = [],
+				point,
+				piece;
+			each(series.boardPositions, function (pos) {
 				piece = validation.get(pos);
 				if (piece) {
 					point = series.addPiece(pos, piece, size);
@@ -156,9 +162,8 @@ require('highcharts-release/highcharts.src.js');
 					if (series.options.interactive) {
 						series.addClickToPiece(point);
 					}
-				}				
-			}
-			// Set the data
+				}	
+			});
 			// @todo Find a way to set data, before Series.processData is called.
 			series.setData(data, false);
 		},
@@ -317,6 +322,7 @@ require('highcharts-release/highcharts.src.js');
 			this.chart.setTitle(null, { text: subtitle }, false);
 
 			this.drawChessBoard();
+			this.drawChessPieces();
 			// Call original translate to generate points, so we can work with them.
 			// @todo setPointValues on the data instead of working with points, then this is is 
 			Series.prototype.translate.call(this);
