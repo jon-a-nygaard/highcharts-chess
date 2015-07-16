@@ -266,11 +266,16 @@ require('highcharts-release/highcharts.src.js');
 			});
 		},
 		translate: function () {
+			var subtitle;
 			if (!this.validation) {
 				// Initialize the game tracker
 				this.validation = new Chess();
 				this.boardPositions = this.getBoardPositions();
 			}
+			// @todo Move this logic to more suitable location. Title logic is already performed, therefore subtitle margins is not correctly calculated.
+			subtitle = (this.validation.turn() === "w" ? "White" : "Black") + " to move";
+			this.chart.setTitle(null, { text: subtitle }, false);
+			
 			this.drawChessBoard();
 			// Call original translate to generate points, so we can work with them.
 			// @todo setPointValues on the data instead of working with points, then this is is 
