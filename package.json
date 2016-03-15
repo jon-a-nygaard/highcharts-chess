@@ -25,12 +25,11 @@
     "chess.js": "^0.9.1",
     "gulp": "^3.9.0",
     "gulp-jslint": "^0.2.2",
-    "jQuery": "^1.7.4",
     "vinyl-buffer": "^1.0.0",
     "vinyl-source-stream": "^1.1.0"
   },
   "dependencies": {
     "chess.js": "^0.9.1",
-    "jquery": "^2.1.4"
+    "highcharts": "^4.2.3"
   }
 }
