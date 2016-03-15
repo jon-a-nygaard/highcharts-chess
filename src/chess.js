@@ -50,18 +50,16 @@
 		type: "chess",
 		/**
 		 * Creates a single rectangle, representing one board square, and returns the created element.
-		 * @param Number x The starting x position of the square.
-		 * @param Number y The starting y position of the square.
-		 * @param Number length The length of the sides on the square.
-		 * @return Element Returns a Highcharts Element.
+		 * @param {String} The position of the square.
+		 * @return {Element} Returns a Highcharts Element.
 		 */
 		addBoardSquare: function (pos) {
 			var size = this.getSquareSizeFromPosition(pos),
 				element = this.chart.renderer.rect(size.x, size.y, size.width, size.height, 0)
 				.attr({
 					zIndex: 0,
-					"data-pos": pos
 				}).add(this.boardGroup);
+				element.position = pos;
 				return element;
 		},
 		addClickToPiece: function (piece) {
@@ -73,8 +71,9 @@
 				series.doClickAction(this.position, this.color);
 			};
 		},
-		addClickToSquare: function (element, pos) {
-			var series = this;
+		addClickToSquare: function (element) {
+			var series = this,
+				pos = element.position;
 			element.on("click", function () {
 				var piece = series.validation.get({ square: pos }),
 					color = (piece ? piece.color : undefined);
@@ -129,16 +128,16 @@
 				board = series.board = [];
 				each(series.boardPositions, function (pos) {
 					square = series.addBoardSquare(pos);
-					board[pos] = square;
+					board.push(square);
 				});
 			}
-			for (var pos in board) {
-				series.setSquareSizes(board[pos], pos);
-				series.setSquareFill(board[pos], pos);
+			each(series.board, function (element) {
+				series.setSquareSizes(element);
+				series.setSquareFill(element);
 				if (series.options.interactive) {
-					series.addClickToSquare(board[pos], pos);
+					series.addClickToSquare(element);
 				}
-			}
+			})
 		},
 		drawChessPieces: function () {
 			var series = this,
@@ -276,8 +275,9 @@
 				verbose: true
 			});
 		},
-		setSquareFill: function (element, pos) {
+		setSquareFill: function (element) {
 			var series = this,
+				pos = element.position,
 				validMoves = series.validMoves,
 				validMove = validMoves && any(validMoves, function (move) {
 					return move.to === pos;
@@ -294,8 +294,8 @@
 				fill: fill
 			});
 		},
-		setSquareSizes: function (element, pos) {
-			var size = this.getSquareSizeFromPosition(pos);
+		setSquareSizes: function (element) {
+			var size = this.getSquareSizeFromPosition(element.position);
 			element.animate(size);
 		},
 		translate: function () {
