@@ -242,7 +242,8 @@
 			if (selected) {
 				moved = validation.move({
 					from: series.selected,
-					to: pos
+					to: pos,
+					promotion: 'q'
 				});
 				if (moved) {
 					series.moveStack = [];
@@ -341,7 +342,8 @@
 			var move = (this.moveStack.length) ? this.moveStack.pop() : false,
 				moved = this.validation.move({
 					from: move.from,
-					to: move.to
+					to: move.to,
+					promotion: move.promotion
 				});
 			if (moved !== null) {
 				this.isDirty = true;
