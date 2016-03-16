@@ -245,10 +245,12 @@
 					to: pos
 				});
 				if (moved) {
+					series.moveStack = [];
 					series.removeSelected();
 				}
 			}
 		},
+		moveStack: [],
 		removeSelected: function () {
 			delete this.selected;
 			delete this.validMoves;
@@ -323,6 +325,32 @@
 			Series.prototype.translate.call(this);
 			this.setPointValues();
 			Series.prototype.translate.call(this); // Call again to set correct point values
+		},
+		undo: function () {
+			var move = this.validation.undo();
+			if (move !== null) {
+				this.isDirty = true;
+				this.chart.redraw();
+				this.moveStack.push(move);
+			} else {
+				move = false;
+			}
+			return move;
+		},
+		redo: function () {
+			var move = (this.moveStack.length) ? this.moveStack.pop() : false,
+				moved = this.validation.move({
+					from: move.from,
+					to: move.to
+				});
+			if (moved !== null) {
+				this.isDirty = true;
+				this.chart.redraw();
+			} else {
+				this.moveStack.push(move);
+				move = false;
+			}
+			return move;
 		},
 		bindAxes: function () {
 			var chessAxis = {
