@@ -2,11 +2,7 @@ var chess = require('./chess.js');
 var chart = new chess.Chart({
 	chart: {
 		animation: false,
-		renderTo: 'container',
-		width: 400,
-		height: 400,
-		plotBorderWidth: 1,
-		plotBorderColor: '#000000'
+		renderTo: 'container'
 	},
 	series: [{
 		type: "chess",

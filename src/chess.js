@@ -6,6 +6,7 @@
 		each = H.each,
 		extendClass = H.extendClass,
 		merge = H.merge,
+		pick = H.pick,
 		plotOptions = defaultOptions.plotOptions,
 		Series = H.Series,
 		seriesTypes = H.seriesTypes;
@@ -30,6 +31,15 @@
 		});
 		return found;
 	}
+
+	/**
+	 * Override the Highcharts axis to always be square.
+	 * @todo  Instead of overriding, compose the SquareAxis from the default Axis.
+	 */
+	H.wrap(H.Axis.prototype, 'setAxisSize', function (proceed) {
+		proceed.call(this);
+		this.len = Math.max(Math.min(this.width, this.height), 0);
+	});
 
 	/* Default plotting options */
 	plotOptions.chess = merge(plotOptions.scatter, {
