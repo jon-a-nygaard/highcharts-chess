@@ -4,7 +4,7 @@
   "description": "Chess made with Highcharts",
   "main": "chess.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "test": "eslint src/app.js",
     "build": "browserify src/app.js | uglifyjs > dist/app.min.js"
   },
   "repository": {
@@ -24,6 +24,7 @@
   "devDependencies": {
     "browserify": "^10.2.6",
     "chess.js": "^0.9.1",
+    "eslint": "^3.19.0",
     "gulp": "^3.9.0",
     "gulp-jslint": "^0.2.2",
     "uglify-js": "^2.8.21",
