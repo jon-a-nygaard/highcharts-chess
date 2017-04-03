@@ -23,13 +23,8 @@
   "homepage": "https://github.com/jon-a-nygaard/highchess",
   "devDependencies": {
     "browserify": "^10.2.6",
-    "chess.js": "^0.9.1",
     "eslint": "^3.19.0",
-    "gulp": "^3.9.0",
-    "gulp-jslint": "^0.2.2",
     "uglify-js": "^2.8.21",
-    "vinyl-buffer": "^1.0.0",
-    "vinyl-source-stream": "^1.1.0"
   },
   "dependencies": {
     "chess.js": "^0.9.1",
