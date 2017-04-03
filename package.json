@@ -4,7 +4,8 @@
   "description": "Chess made with Highcharts",
   "main": "chess.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "browserify src/app.js | uglifyjs > dist/app.min.js"
   },
   "repository": {
     "type": "git",
@@ -21,10 +22,11 @@
   },
   "homepage": "https://github.com/jon-a-nygaard/highchess",
   "devDependencies": {
-    "browserify": "^10.2.4",
+    "browserify": "^10.2.6",
     "chess.js": "^0.9.1",
     "gulp": "^3.9.0",
     "gulp-jslint": "^0.2.2",
+    "uglify-js": "^2.8.21",
     "vinyl-buffer": "^1.0.0",
     "vinyl-source-stream": "^1.1.0"
   },
