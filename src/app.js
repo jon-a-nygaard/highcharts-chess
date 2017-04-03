@@ -1,5 +1,5 @@
 'use strict'
-const chess = require('./chess.js')
+import chess from './chess.js'
 // TODO Add own chess constructor to Highchart. Highcharts.chess
 chess.chart({
   chart: {

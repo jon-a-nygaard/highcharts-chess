@@ -1,6 +1,6 @@
 'use strict'
-let H = require('highcharts')
-let Chess = require('chess.js').Chess
+import H from 'highcharts'
+import { Chess } from 'chess.js'
 let defaultOptions = H.getOptions()
 let each = H.each
 let extendClass = H.extendClass
@@ -379,7 +379,4 @@ seriesTypes.chess = extendClass(seriesTypes.scatter, merge({
   }
 }))
 
-// Return Highcharts object to node
-if (typeof module === 'object' && typeof module.exports === 'object') {
-  module.exports = H
-}
+export default H
