@@ -1,13 +1,8 @@
 'use strict'
 import H from 'highcharts'
 import { Chess } from 'chess.js'
-let defaultOptions = H.getOptions()
 let each = H.each
-let extendClass = H.extendClass
-let merge = H.merge
-let plotOptions = defaultOptions.plotOptions
 let Series = H.Series
-let seriesTypes = H.seriesTypes
 
 /**
  * Returns true if any item in a collection matches a given predicate.
@@ -39,8 +34,10 @@ H.wrap(H.Axis.prototype, 'setAxisSize', function (proceed) {
   this.len = Math.max(Math.min(this.width, this.height), 0)
 })
 
-/* Default plotting options */
-plotOptions.chess = merge(plotOptions.scatter, {
+/**
+ * Add chess as a new type of series.
+ **/
+H.seriesType('chess', 'scatter', {
   dataLabels: {
     enabled: false
   },
@@ -51,11 +48,7 @@ plotOptions.chess = merge(plotOptions.scatter, {
     }
   },
   showInLegend: false
-})
-
-/* Series functions */
-seriesTypes.chess = extendClass(seriesTypes.scatter, merge({
-  type: 'chess',
+}, {
   /**
    * Creates a single rectangle, representing one board square, and returns the created element.
    * @param {String} The position of the square.
@@ -377,6 +370,6 @@ seriesTypes.chess = extendClass(seriesTypes.scatter, merge({
     H.extend(this.yAxis.options, chessAxis)
     H.extend(this.xAxis.options, chessAxis)
   }
-}))
+})
 
 export default H
