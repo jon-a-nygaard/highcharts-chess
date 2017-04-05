@@ -1,6 +1,7 @@
 'use strict'
 import H from 'highcharts'
 import { Chess } from 'chess.js'
+import Board from './board.js'
 let each = H.each
 let Series = H.Series
 
@@ -49,6 +50,10 @@ H.seriesType('chess', 'scatter', {
   },
   showInLegend: false
 }, {
+  init: function (chart, options) {
+    this.board = new Board(this, chart.renderer)
+    H.seriesTypes.scatter.prototype.init.call(this, chart, options)
+  },
   /**
    * Creates a single rectangle, representing one board square, and returns the created element.
    * @param {String} The position of the square.
@@ -121,16 +126,16 @@ H.seriesType('chess', 'scatter', {
   */
   drawChessBoard: function () {
     let series = this
-    let board = series.board
+    let boardSquares = series.boardSquares
     let square
-    if (!board) {
-      board = series.board = []
+    if (!boardSquares) {
+      boardSquares = series.boardSquares = []
       each(series.boardPositions, function (pos) {
         square = series.addBoardSquare(pos)
-        board.push(square)
+        boardSquares.push(square)
       })
     }
-    each(series.board, function (element) {
+    each(series.boardSquares, function (element) {
       series.setSquareSizes(element)
       series.setSquareFill(element)
       if (series.options.interactive) {
