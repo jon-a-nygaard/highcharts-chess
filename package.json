@@ -5,7 +5,8 @@
   "main": "chess.js",
   "scripts": {
     "test": "eslint src/app.js",
-    "build": "browserify src/app.js -t babelify > dist/app.min.js"
+    "build": "browserify src/app.js -t babelify > dist/app.min.js",
+    "watch:build": "watch \"npm run build\" src/"
   },
   "repository": {
     "type": "git",
@@ -26,7 +27,8 @@
     "babelify": "^7.3.0",
     "browserify": "^10.2.6",
     "eslint": "^3.19.0",
-    "uglify-js": "^2.8.21"
+    "uglify-js": "^2.8.21",
+    "watch": "^1.0.2"
   },
   "dependencies": {
     "chess.js": "^0.9.1",
