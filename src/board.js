@@ -1,10 +1,10 @@
 'use strict'
-// const each = (arr, fn, ctx) => Array.prototype.forEach.call(arr, fn, ctx)
+const each = (arr, fn, ctx) => Array.prototype.forEach.call(arr, fn, ctx)
 const any = (arr, predicate) => arr.some(predicate)
+const map = (arr, fn) => arr.map(fn)
 
-function Board (series, renderer) {
-  this.renderer = renderer
-  this.series = series
+function Board (options, series, renderer) {
+  this.init(options, series, renderer)
   return this
 }
 
@@ -12,10 +12,52 @@ Board.prototype = {
   /**
    * Initialization of the board. Should only run once.
    */
-  init: function () {
-    this.render()
+  init: function (options, series, renderer) {
+    this.renderer = renderer
+    this.series = series
+    this.options = options
+    this.positions = this.getBoardPositions()
+    this.group = renderer.g('boardSquares').attr({
+      zIndex: 1 // Draw squares above the background
+    }).add()
+    if (options.interactive) {
+      this.group.css({
+        cursor: 'pointer'
+      })
+    }
+    // this.render() To early to render
+  },
+  addBoardSquare: function (pos) {
+    let size = this.getSquareSizeFromPosition(pos)
+    let element = this.renderer.rect(size.x, size.y, size.width, size.height, 0)
+      .attr({
+        zIndex: 0
+      }).add(this.group)
+    element.position = pos
+    return element
   },
   columns: ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h'],
+  /**
+  * Draws all the rectangles for the chess board
+  * @todo: set board size in options.
+  */
+  drawChessBoard: function () {
+    const board = this
+    const series = board.series
+    let squares = board.squares
+    if (!squares) {
+      squares = board.squares = map(board.positions, function (pos) {
+        return board.addBoardSquare(pos)
+      })
+    }
+    each(squares, function (element) {
+      board.setSquareSizes(element)
+      board.setSquareFill(element)
+      if (board.options.interactive) {
+        series.addClickToSquare(element)
+      }
+    })
+  },
   /**
    * Returns an array of all square positions on the board.
    * @return {String[]} The positions.
@@ -38,7 +80,7 @@ Board.prototype = {
    * @return {String} Color, The dark or light fill color of the board.
    */
   getFillFromPosition: function (pos) {
-    let board = this.series.options.board
+    let board = this.options
     let file = this.columns.indexOf(pos.charAt(0)) % 2
     let rank = pos.charAt(1) % 2
     let light = ((file - rank) === 0)
@@ -74,6 +116,7 @@ Board.prototype = {
   },
   setSquareFill: function (element) {
     const board = this
+    const options = board.options
     let series = board.series
     let pos = element.position
     let validMoves = series.validMoves
@@ -82,9 +125,9 @@ Board.prototype = {
     })
     let fill
     if (series.selected === pos) {
-      fill = (series.options.board.selected ? series.options.board.selected : board.getFillFromPosition(pos))
+      fill = (options.selected ? options.selected : board.getFillFromPosition(pos))
     } else if (validMove) {
-      fill = series.options.board.moves
+      fill = options.moves
     } else {
       fill = board.getFillFromPosition(pos)
     }
@@ -100,6 +143,7 @@ Board.prototype = {
    * Render the board. Called on initialization and update.
    */
   render: function () {
+    this.drawChessBoard()
   }
 }
 

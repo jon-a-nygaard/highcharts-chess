@@ -42,7 +42,6 @@ H.seriesType('chess', 'scatter', {
   dataLabels: {
     enabled: false
   },
-  interactive: true,
   states: {
     hover: {
       enabled: false
@@ -51,7 +50,7 @@ H.seriesType('chess', 'scatter', {
   showInLegend: false
 }, {
   init: function (chart, options) {
-    this.board = new Board(this, chart.renderer)
+    this.board = new Board(options.board, this, chart.renderer)
     H.seriesTypes.scatter.prototype.init.call(this, chart, options)
   },
   /**
@@ -59,15 +58,6 @@ H.seriesType('chess', 'scatter', {
    * @param {String} The position of the square.
    * @return {Element} Returns a Highcharts Element.
    */
-  addBoardSquare: function (pos) {
-    let size = this.board.getSquareSizeFromPosition(pos)
-    let element = this.chart.renderer.rect(size.x, size.y, size.width, size.height, 0)
-      .attr({
-        zIndex: 0
-      }).add(this.boardGroup)
-    element.position = pos
-    return element
-  },
   addClickToPiece: function (piece) {
     let series = this
     if (!piece.events) {
@@ -119,32 +109,9 @@ H.seriesType('chess', 'scatter', {
     series.isDirty = true
     series.chart.redraw()
   },
-  /**
-  * Draws all the rectangles for the chess board
-  * @todo: set board size in options.
-  */
-  drawChessBoard: function () {
+  drawChessPieces: function () {
     const series = this
     const board = series.board
-    let boardSquares = series.boardSquares
-    let square
-    if (!boardSquares) {
-      boardSquares = series.boardSquares = []
-      each(series.boardPositions, function (pos) {
-        square = series.addBoardSquare(pos)
-        boardSquares.push(square)
-      })
-    }
-    each(series.boardSquares, function (element) {
-      board.setSquareSizes(element)
-      board.setSquareFill(element)
-      if (series.options.interactive) {
-        series.addClickToSquare(element)
-      }
-    })
-  },
-  drawChessPieces: function () {
-    let series = this
     let validation = series.validation
     let width = series.xAxis.translate(2, 0, 0, 0, 1) - series.xAxis.translate(0, 0, 0, 0, 1)
     let height = series.yAxis.translate(2, 0, 0, 0, 1) - series.yAxis.translate(0, 0, 0, 0, 1)
@@ -152,12 +119,12 @@ H.seriesType('chess', 'scatter', {
     let data = []
     let point
     let piece
-    each(series.boardPositions, function (pos) {
+    each(board.positions, function (pos) {
       piece = validation.get(pos)
       if (piece) {
         point = series.addPiece(pos, piece, size)
         data.push(point)
-        if (series.options.interactive) {
+        if (board.options.interactive) {
           series.addClickToPiece(point)
         }
       }
@@ -232,20 +199,15 @@ H.seriesType('chess', 'scatter', {
     if (!this.validation) {
       // Initialize the game tracker
       this.validation = new Chess()
-      this.boardPositions = this.board.getBoardPositions()
-      this.boardGroup = this.chart.renderer.g('boardSquares').add()
-      if (this.options.interactive) {
-        this.boardGroup.css({
-          cursor: 'pointer'
-        })
-        this.options.cursor = 'pointer'
-      }
+    }
+    if (this.board.options.interactive) {
+      this.options.cursor = 'pointer'
     }
     // @todo Move this logic to more suitable location. Title logic is already performed, therefore subtitle margins is not correctly calculated.
     subtitle = (this.validation.turn() === 'w' ? 'White' : 'Black') + ' to move'
     this.chart.setTitle(null, { text: subtitle }, false)
 
-    this.drawChessBoard()
+    this.board.render()
     this.drawChessPieces()
     // Call original translate to generate points, so we can work with them.
     // @todo setPointValues on the data instead of working with points, then this is

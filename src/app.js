@@ -13,7 +13,8 @@ chess.chart({
       dark: '#9F1815',
       light: '#B52B27',
       selected: false,
-      moves: '#DF625F'
+      moves: '#DF625F',
+      interactive: true
     }
   }],
   title: {
