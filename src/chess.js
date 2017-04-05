@@ -50,8 +50,14 @@ H.seriesType('chess', 'scatter', {
   showInLegend: false
 }, {
   init: function (chart, options) {
-    this.board = new Board(options.board, this, chart.renderer)
-    H.seriesTypes.scatter.prototype.init.call(this, chart, options)
+    const series = this
+    series.board = new Board(options.board, series, chart.renderer)
+    series.board.onSquareClick = function (pos) {
+      let piece = series.validation.get({ square: pos })
+      let color = (piece ? piece.color : undefined)
+      series.doClickAction(pos, color)
+    }
+    H.seriesTypes.scatter.prototype.init.call(series, chart, options)
   },
   /**
    * Creates a single rectangle, representing one board square, and returns the created element.
@@ -67,15 +73,7 @@ H.seriesType('chess', 'scatter', {
       series.doClickAction(this.position, this.color)
     }
   },
-  addClickToSquare: function (element) {
-    let series = this
-    let pos = element.position
-    element.on('click', function () {
-      let piece = series.validation.get({ square: pos })
-      let color = (piece ? piece.color : undefined)
-      series.doClickAction(pos, color)
-    })
-  },
+
   addPiece: function (pos, obj, size) {
     let piece = {
       color: obj.color,

@@ -36,6 +36,13 @@ Board.prototype = {
     element.position = pos
     return element
   },
+  addClickToSquare: function (element) {
+    const board = this
+    const pos = element.position
+    element.on('click', function () {
+      board.onSquareClick(pos)
+    })
+  },
   columns: ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h'],
   /**
   * Draws all the rectangles for the chess board
@@ -43,7 +50,6 @@ Board.prototype = {
   */
   drawChessBoard: function () {
     const board = this
-    const series = board.series
     let squares = board.squares
     if (!squares) {
       squares = board.squares = map(board.positions, function (pos) {
@@ -54,7 +60,7 @@ Board.prototype = {
       board.setSquareSizes(element)
       board.setSquareFill(element)
       if (board.options.interactive) {
-        series.addClickToSquare(element)
+        board.addClickToSquare(element)
       }
     })
   },
