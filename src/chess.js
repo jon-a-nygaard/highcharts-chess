@@ -99,7 +99,6 @@ H.seriesType('chess', 'scatter', {
     }
     return piece
   },
-  columns: ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h'],
   doClickAction: function (pos, color) {
     let series = this
     let validMove
@@ -164,44 +163,6 @@ H.seriesType('chess', 'scatter', {
     })
     // @todo Find a way to set data, before Series.processData is called.
     series.setData(data, false)
-  },
-  /**
-   * Returns an array of all square positions on the board.
-   * @return {String[]} The positions.
-   */
-  getBoardPositions: function () {
-    let series = this
-    let pos
-    let positions = []
-    for (let rank = 8; rank > 0; rank--) {
-      for (let file = 0; file < 8; file++) {
-        pos = series.getPosition(file, rank)
-        positions.push(pos)
-      }
-    }
-    return positions
-  },
-  /**
-   * Returns the dark or light fill color of a square, based upon its position.
-   * @param {String} pos The board position of the square.
-   * @return {String} Color, The dark or light fill color of the board.
-   */
-  getFillFromPosition: function (pos) {
-    let board = this.options.board
-    let file = this.columns.indexOf(pos.charAt(0)) % 2
-    let rank = pos.charAt(1) % 2
-    let light = ((file - rank) === 0)
-    let fill = light ? board.light : board.dark
-    return fill
-  },
-  /**
-   * Returns the position on the board from a file and rank number.
-   * @param Number file The number of file.
-   * @param Number rank The number of rank.
-   * @return String The board position.
-   */
-  getPosition: function (file, rank) {
-    return this.columns[file] + rank
   },
   getSquareSizeFromPosition: function (pos) {
     let series = this
@@ -291,11 +252,11 @@ H.seriesType('chess', 'scatter', {
     })
     let fill
     if (series.selected === pos) {
-      fill = (series.options.board.selected ? series.options.board.selected : series.getFillFromPosition(pos))
+      fill = (series.options.board.selected ? series.options.board.selected : series.board.getFillFromPosition(pos))
     } else if (validMove) {
       fill = series.options.board.moves
     } else {
-      fill = series.getFillFromPosition(pos)
+      fill = series.board.getFillFromPosition(pos)
     }
     element.attr({
       fill: fill
@@ -310,7 +271,7 @@ H.seriesType('chess', 'scatter', {
     if (!this.validation) {
       // Initialize the game tracker
       this.validation = new Chess()
-      this.boardPositions = this.getBoardPositions()
+      this.boardPositions = this.board.getBoardPositions()
       this.boardGroup = this.chart.renderer.g('boardSquares').add()
       if (this.options.interactive) {
         this.boardGroup.css({
