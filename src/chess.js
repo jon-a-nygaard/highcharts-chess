@@ -60,7 +60,7 @@ H.seriesType('chess', 'scatter', {
    * @return {Element} Returns a Highcharts Element.
    */
   addBoardSquare: function (pos) {
-    let size = this.getSquareSizeFromPosition(pos)
+    let size = this.board.getSquareSizeFromPosition(pos)
     let element = this.chart.renderer.rect(size.x, size.y, size.width, size.height, 0)
       .attr({
         zIndex: 0
@@ -124,7 +124,8 @@ H.seriesType('chess', 'scatter', {
   * @todo: set board size in options.
   */
   drawChessBoard: function () {
-    let series = this
+    const series = this
+    const board = series.board
     let boardSquares = series.boardSquares
     let square
     if (!boardSquares) {
@@ -135,8 +136,8 @@ H.seriesType('chess', 'scatter', {
       })
     }
     each(series.boardSquares, function (element) {
-      series.setSquareSizes(element)
-      series.setSquareFill(element)
+      board.setSquareSizes(element)
+      board.setSquareFill(element)
       if (series.options.interactive) {
         series.addClickToSquare(element)
       }
@@ -163,24 +164,6 @@ H.seriesType('chess', 'scatter', {
     })
     // @todo Find a way to set data, before Series.processData is called.
     series.setData(data, false)
-  },
-  getSquareSizeFromPosition: function (pos) {
-    let series = this
-    let xAxis = series.xAxis
-    let yAxis = series.yAxis
-    let x = series.getXFromPosition(pos)
-    let y = series.getYFromPosition(pos)
-    let x1 = xAxis.left + Math.round(xAxis.translate(x - 1, 0, 0, 0, 1))
-    let x2 = xAxis.left + Math.round(xAxis.translate(x + 1, 0, 0, 0, 1))
-    let y1 = xAxis.top + Math.round(yAxis.translate(16 - y - 1, 0, 0, 0, 1))
-    let y2 = xAxis.top + Math.round(yAxis.translate(16 - y + 1, 0, 0, 0, 1))
-    let size = {
-      x: x1,
-      y: y1,
-      width: x2 - x1,
-      height: y2 - y1
-    }
-    return size
   },
   /**
    * Returns the X value of a board position.
@@ -243,29 +226,7 @@ H.seriesType('chess', 'scatter', {
       verbose: true
     })
   },
-  setSquareFill: function (element) {
-    let series = this
-    let pos = element.position
-    let validMoves = series.validMoves
-    let validMove = validMoves && any(validMoves, function (move) {
-      return move.to === pos
-    })
-    let fill
-    if (series.selected === pos) {
-      fill = (series.options.board.selected ? series.options.board.selected : series.board.getFillFromPosition(pos))
-    } else if (validMove) {
-      fill = series.options.board.moves
-    } else {
-      fill = series.board.getFillFromPosition(pos)
-    }
-    element.attr({
-      fill: fill
-    })
-  },
-  setSquareSizes: function (element) {
-    let size = this.getSquareSizeFromPosition(element.position)
-    element.animate(size)
-  },
+
   translate: function () {
     let subtitle
     if (!this.validation) {
