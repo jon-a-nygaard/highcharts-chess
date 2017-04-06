@@ -1,10 +1,19 @@
 'use strict'
 import chess from './chess.js'
+const updateStatus = (status) => {
+  const turn = document.getElementById('turn')
+  const move = document.getElementById('move')
+  turn.innerHTML = (status.turn === 'w' ? 'White' : 'Black') + ' to move'
+  if (status.move) {
+    move.innerHTML = 'From ' + status.move.from + ' to ' + status.move.to
+  }
+}
 // TODO Add own chess constructor to Highchart. Highcharts.chess
-chess.chart({
+const chart = chess.chart({
   chart: {
     animation: false,
-    renderTo: 'container'
+    renderTo: 'chart',
+    backgroundColor: '#455A64'
   },
   series: [{
     type: 'chess',
@@ -15,12 +24,19 @@ chess.chart({
       selected: false,
       moves: '#DF625F',
       interactive: true
-    }
+    },
+    onMove: updateStatus
   }],
   title: {
-    text: 'Chess made with Highcharts'
+    text: null
   },
   tooltip: {
     enabled: false
   }
 })
+const series = chart.series[0]
+updateStatus({
+  turn: series.validation.turn()
+})
+document.getElementById('undo').onclick = () => series.undo()
+document.getElementById('redo').onclick = () => series.redo()

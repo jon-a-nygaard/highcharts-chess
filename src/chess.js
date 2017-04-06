@@ -161,12 +161,22 @@ H.seriesType('chess', 'scatter', {
         promotion: 'q'
       })
       if (moved) {
+        series.onMove(moved)
         series.moveStack = []
         series.removeSelected()
       }
     }
   },
   moveStack: [],
+  onMove: function (move) {
+    const v = this.validation
+    if (this.options.onMove) {
+      this.options.onMove({
+        turn: v.turn(),
+        move: move
+      })
+    }
+  },
   removeSelected: function () {
     delete this.selected
     delete this.validMoves
@@ -195,18 +205,13 @@ H.seriesType('chess', 'scatter', {
   },
 
   translate: function () {
-    let subtitle
     if (this.board.options.interactive) {
       this.options.cursor = 'pointer'
     }
-    // @todo Move this logic to more suitable location. Title logic is already performed, therefore subtitle margins is not correctly calculated.
-    subtitle = (this.validation.turn() === 'w' ? 'White' : 'Black') + ' to move'
-    this.chart.setTitle(null, { text: subtitle }, false)
-
     this.board.render()
     this.drawChessPieces()
     // Call original translate to generate points, so we can work with them.
-    // @todo setPointValues on the data instead of working with points, then this is
+    // TODO setPointValues on the data instead of working with points
     Series.prototype.translate.call(this)
     this.setPointValues()
     Series.prototype.translate.call(this) // Call again to set correct point values
@@ -214,6 +219,7 @@ H.seriesType('chess', 'scatter', {
   undo: function () {
     let move = this.validation.undo()
     if (move !== null) {
+      this.onMove(move)
       this.isDirty = true
       this.chart.redraw()
       this.moveStack.push(move)
@@ -230,6 +236,7 @@ H.seriesType('chess', 'scatter', {
       promotion: move.promotion
     })
     if (moved !== null) {
+      this.onMove(moved)
       this.isDirty = true
       this.chart.redraw()
     } else {
