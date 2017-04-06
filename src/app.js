@@ -21,7 +21,7 @@ const chart = chess.chart({
       // Palette: http://paletton.com/#uid=101050kp5mHv9gRrOjYlRp9ios2
       dark: '#9F1815',
       light: '#B52B27',
-      selected: false,
+      selected: '#860704',
       moves: '#DF625F',
       interactive: true
     },
