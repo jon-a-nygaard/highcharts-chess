@@ -7,24 +7,11 @@ let Series = H.Series
 
 /**
  * Returns true if any item in a collection matches a given predicate.
- * Inspired by Underscore.js _.any function.
  * @param {Mixed[]} Collection to look in.
  * @param {Function} Predicate to control.
  * @returns {Bool} True if any item in the collection matches the predicate.
- * @todo Only works for arrays, should modif to work with objects
  */
-const any = (obj, predicate) => {
-  let found = false
-  let result
-  H.each(obj, function (item) {
-    result = predicate(item)
-    if (result) {
-      found = true
-      // @todo break the loop.
-    }
-  })
-  return found
-}
+const any = (arr, predicate) => arr.some(predicate)
 
 /**
  * Override the Highcharts axis to always be square.
