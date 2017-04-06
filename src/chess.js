@@ -57,6 +57,8 @@ H.seriesType('chess', 'scatter', {
       let color = (piece ? piece.color : undefined)
       series.doClickAction(pos, color)
     }
+    // Initialize the game tracker
+    series.validation = new Chess()
     H.seriesTypes.scatter.prototype.init.call(series, chart, options)
   },
   /**
@@ -194,10 +196,6 @@ H.seriesType('chess', 'scatter', {
 
   translate: function () {
     let subtitle
-    if (!this.validation) {
-      // Initialize the game tracker
-      this.validation = new Chess()
-    }
     if (this.board.options.interactive) {
       this.options.cursor = 'pointer'
     }
