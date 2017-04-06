@@ -2,8 +2,13 @@
 import H from 'highcharts'
 import { Chess } from 'chess.js'
 import Board from './board.js'
-let each = H.each
-let Series = H.Series
+const Axis = H.Axis.prototype
+const Series = H.Series.prototype
+const scatterSeries = H.seriesTypes.scatter.prototype
+const extend = H.extend
+const each = H.each
+const wrap = H.wrap
+const seriesType = H.seriesType
 
 /**
  * Returns true if any item in a collection matches a given predicate.
@@ -17,7 +22,7 @@ const any = (arr, predicate) => arr.some(predicate)
  * Override the Highcharts axis to always be square.
  * @todo  Instead of overriding, compose the SquareAxis from the default Axis.
  */
-H.wrap(H.Axis.prototype, 'setAxisSize', function (proceed) {
+wrap(Axis, 'setAxisSize', function (proceed) {
   proceed.call(this)
   this.len = Math.max(Math.min(this.width, this.height), 0)
 })
@@ -25,7 +30,7 @@ H.wrap(H.Axis.prototype, 'setAxisSize', function (proceed) {
 /**
  * Add chess as a new type of series.
  **/
-H.seriesType('chess', 'scatter', {
+seriesType('chess', 'scatter', {
   dataLabels: {
     enabled: false
   },
@@ -46,7 +51,7 @@ H.seriesType('chess', 'scatter', {
     }
     // Initialize the game tracker
     series.validation = new Chess()
-    H.seriesTypes.scatter.prototype.init.call(series, chart, options)
+    scatterSeries.init.call(series, chart, options)
   },
   /**
    * Creates a single rectangle, representing one board square, and returns the created element.
@@ -199,9 +204,9 @@ H.seriesType('chess', 'scatter', {
     this.drawChessPieces()
     // Call original translate to generate points, so we can work with them.
     // TODO setPointValues on the data instead of working with points
-    Series.prototype.translate.call(this)
+    Series.translate.call(this)
     this.setPointValues()
-    Series.prototype.translate.call(this) // Call again to set correct point values
+    Series.translate.call(this) // Call again to set correct point values
   },
   undo: function () {
     let move = this.validation.undo()
@@ -245,9 +250,9 @@ H.seriesType('chess', 'scatter', {
       title: null,
       tickPositions: []
     }
-    Series.prototype.bindAxes.call(this)
-    H.extend(this.yAxis.options, chessAxis)
-    H.extend(this.xAxis.options, chessAxis)
+    Series.bindAxes.call(this)
+    extend(this.yAxis.options, chessAxis)
+    extend(this.xAxis.options, chessAxis)
   }
 })
 
