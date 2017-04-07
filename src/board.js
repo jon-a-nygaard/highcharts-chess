@@ -2,6 +2,15 @@
 const each = (arr, fn, ctx) => Array.prototype.forEach.call(arr, fn, ctx)
 const any = (arr, predicate) => arr.some(predicate)
 const map = (arr, fn) => arr.map(fn)
+const squareZIndex = 0
+const columns = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h']
+/**
+ * Returns the position on the board from a file and rank number.
+ * @param Number file The number of file.
+ * @param Number rank The number of rank.
+ * @return String The board position.
+ */
+const getPosition = (file, rank) => columns[file] + rank
 
 function Board (options, series, renderer) {
   this.init(options, series, renderer)
@@ -28,10 +37,10 @@ Board.prototype = {
     // this.render() To early to render
   },
   addBoardSquare: function (pos) {
-    let size = this.getSquareSizeFromPosition(pos)
+    const size = this.getSquareSizeFromPosition(pos)
     let element = this.renderer.rect(size.x, size.y, size.width, size.height, 0)
       .attr({
-        zIndex: 0
+        zIndex: squareZIndex
       }).add(this.group)
     element.position = pos
     return element
@@ -43,7 +52,6 @@ Board.prototype = {
       board.onSquareClick(pos)
     })
   },
-  columns: ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h'],
   /**
   * Draws all the rectangles for the chess board
   * @todo: set board size in options.
@@ -52,9 +60,7 @@ Board.prototype = {
     const board = this
     let squares = board.squares
     if (!squares) {
-      squares = board.squares = map(board.positions, function (pos) {
-        return board.addBoardSquare(pos)
-      })
+      squares = board.squares = map(board.positions, (pos) => board.addBoardSquare(pos))
     }
     each(squares, function (element) {
       board.setSquareSizes(element)
@@ -69,12 +75,13 @@ Board.prototype = {
    * @return {String[]} The positions.
    */
   getBoardPositions: function () {
-    let board = this
     let pos
     let positions = []
+    // TODO Use reduce for this
+    // TODO Pass in file and rank as parameters
     for (let rank = 8; rank > 0; rank--) {
       for (let file = 0; file < 8; file++) {
-        pos = board.getPosition(file, rank)
+        pos = getPosition(file, rank)
         positions.push(pos)
       }
     }
@@ -86,22 +93,14 @@ Board.prototype = {
    * @return {String} Color, The dark or light fill color of the board.
    */
   getFillFromPosition: function (pos) {
-    let board = this.options
-    let file = this.columns.indexOf(pos.charAt(0)) % 2
-    let rank = pos.charAt(1) % 2
-    let light = ((file - rank) === 0)
-    let fill = light ? board.light : board.dark
-    return fill
+    const board = this.options
+    const file = columns.indexOf(pos.charAt(0)) % 2
+    const rank = pos.charAt(1) % 2
+    const isLight = ((file - rank) === 0)
+    // Return dark or light as string
+    return isLight ? board.light : board.dark
   },
-  /**
-   * Returns the position on the board from a file and rank number.
-   * @param Number file The number of file.
-   * @param Number rank The number of rank.
-   * @return String The board position.
-   */
-  getPosition: function (file, rank) {
-    return this.columns[file] + rank
-  },
+
   getSquareSizeFromPosition: function (pos) {
     let series = this.series
     let xAxis = series.xAxis
