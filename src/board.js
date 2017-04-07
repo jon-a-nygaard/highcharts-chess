@@ -25,6 +25,17 @@ const getBoardPositions = (file, rank) => {
     return arr.concat(row)
   }, [])
 }
+/**
+ * Returns the dark or light fill color of a square, based upon its position.
+ * @param {String} pos The board position of the square.
+ * @return {String} Color, The dark or light fill color of the board.
+ */
+const isDarkOrLight = (pos) => {
+  const file = columns.indexOf(pos.charAt(0)) % 2
+  const rank = pos.charAt(1) % 2
+  // Return dark or light as string
+  return ((file - rank) === 0) ? 'light' : 'dark'
+}
 function Board (options, series, renderer) {
   this.init(options, series, renderer)
   return this
@@ -77,26 +88,12 @@ Board.prototype = {
     }
     each(squares, function (element) {
       board.setSquareSizes(element)
-      board.setSquareFill(element)
+      board.updateSquareFill(element)
       if (board.options.interactive) {
         board.addClickToSquare(element)
       }
     })
   },
-  /**
-   * Returns the dark or light fill color of a square, based upon its position.
-   * @param {String} pos The board position of the square.
-   * @return {String} Color, The dark or light fill color of the board.
-   */
-  getFillFromPosition: function (pos) {
-    const board = this.options
-    const file = columns.indexOf(pos.charAt(0)) % 2
-    const rank = pos.charAt(1) % 2
-    const isLight = ((file - rank) === 0)
-    // Return dark or light as string
-    return isLight ? board.light : board.dark
-  },
-
   getSquareSizeFromPosition: function (pos) {
     let series = this.series
     let xAxis = series.xAxis
@@ -115,25 +112,25 @@ Board.prototype = {
     }
     return size
   },
-  setSquareFill: function (element) {
+  updateSquareFill: function (element) {
     const board = this
     const options = board.options
-    let series = board.series
-    let pos = element.position
-    let validMoves = series.validMoves
-    let validMove = validMoves && any(validMoves, function (move) {
-      return move.to === pos
-    })
-    let fill
-    if (series.selected === pos) {
-      fill = (options.selected ? options.selected : board.getFillFromPosition(pos))
-    } else if (validMove) {
-      fill = options.moves
-    } else {
-      fill = board.getFillFromPosition(pos)
+    const series = board.series
+    const validMoves = series.validMoves
+    const pos = element.position
+    const validMove = validMoves && any(validMoves, move => move.to === pos)
+    const defaultFill = options[isDarkOrLight(pos)]
+    const fills = {
+      default: defaultFill,
+      selected: options.selected || defaultFill,
+      moves: options.moves || defaultFill
     }
+    const state = (series.selected === pos
+      ? 'selected'
+      : (validMove ? 'moves' : 'default')
+    )
     element.attr({
-      fill: fill
+      fill: fills[state]
     })
   },
   setSquareSizes: function (element) {
