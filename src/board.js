@@ -2,6 +2,8 @@
 const each = (arr, fn, ctx) => Array.prototype.forEach.call(arr, fn, ctx)
 const any = (arr, predicate) => arr.some(predicate)
 const map = (arr, fn) => arr.map(fn)
+const reduce = (arr, fn, initial) => arr.reduce(fn, initial)
+const range = (from, to) => Array.from({ length: (to - from + 1) }).map((_, i) => from + i)
 const squareZIndex = 0
 const columns = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h']
 /**
@@ -11,7 +13,18 @@ const columns = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h']
  * @return String The board position.
  */
 const getPosition = (file, rank) => columns[file] + rank
-
+/**
+ * Returns an array of all square positions on the board.
+ * @return {String[]} The positions.
+ */
+const getBoardPositions = (file, rank) => {
+  const ranks = range(1, rank).reverse()
+  const files = range(0, file - 1)
+  return reduce(ranks, (arr, rank) => {
+    const row = files.map(file => getPosition(file, rank))
+    return arr.concat(row)
+  }, [])
+}
 function Board (options, series, renderer) {
   this.init(options, series, renderer)
   return this
@@ -25,7 +38,7 @@ Board.prototype = {
     this.renderer = renderer
     this.series = series
     this.options = options
-    this.positions = this.getBoardPositions()
+    this.positions = getBoardPositions(8, 8)
     this.group = renderer.g('boardSquares').attr({
       zIndex: 1 // Draw squares above the background
     }).add()
@@ -69,23 +82,6 @@ Board.prototype = {
         board.addClickToSquare(element)
       }
     })
-  },
-  /**
-   * Returns an array of all square positions on the board.
-   * @return {String[]} The positions.
-   */
-  getBoardPositions: function () {
-    let pos
-    let positions = []
-    // TODO Use reduce for this
-    // TODO Pass in file and rank as parameters
-    for (let rank = 8; rank > 0; rank--) {
-      for (let file = 0; file < 8; file++) {
-        pos = getPosition(file, rank)
-        positions.push(pos)
-      }
-    }
-    return positions
   },
   /**
    * Returns the dark or light fill color of a square, based upon its position.
