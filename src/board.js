@@ -36,6 +36,22 @@ const isDarkOrLight = (pos) => {
   // Return dark or light as string
   return ((file - rank) === 0) ? 'light' : 'dark'
 }
+/**
+ * Returns the X value of a board position.
+ * @param String pos The board position.
+ * @return Number The X value.
+ */
+const getXFromPosition = (pos) => {
+  let columnsToPosition = { 'a': 1, 'b': 3, 'c': 5, 'd': 7, 'e': 9, 'f': 11, 'g': 13, 'h': 15 }
+  return columnsToPosition[pos.charAt(0)]
+}
+/**
+ * Returns the Y value of a board position.
+ * @param String pos The board position.
+ * @return Number The Y value.
+ */
+const getYFromPosition = pos => 2 * +pos.charAt(1) - 1
+
 function Board (options, series, renderer) {
   this.init(options, series, renderer)
   return this
@@ -92,8 +108,8 @@ Board.prototype = {
     let series = this.series
     let xAxis = series.xAxis
     let yAxis = series.yAxis
-    let x = series.getXFromPosition(pos)
-    let y = series.getYFromPosition(pos)
+    let x = getXFromPosition(pos)
+    let y = getYFromPosition(pos)
     let x1 = xAxis.left + Math.round(xAxis.translate(x - 1, 0, 0, 0, 1))
     let x2 = xAxis.left + Math.round(xAxis.translate(x + 1, 0, 0, 0, 1))
     let y1 = xAxis.top + Math.round(yAxis.translate(16 - y - 1, 0, 0, 0, 1))
@@ -106,6 +122,8 @@ Board.prototype = {
     }
     return size
   },
+  getXFromPosition: getXFromPosition,
+  getYFromPosition: getYFromPosition,
   updateSquareFill: function (element) {
     const board = this
     const options = board.options

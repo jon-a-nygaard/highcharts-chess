@@ -124,23 +124,6 @@ seriesType('chess', 'scatter', {
     // @todo Find a way to set data, before Series.processData is called.
     series.setData(data, false)
   },
-  /**
-   * Returns the X value of a board position.
-   * @param String pos The board position.
-   * @return Number The X value.
-   */
-  getXFromPosition: function (pos) {
-    let columnsToPosition = { 'a': 1, 'b': 3, 'c': 5, 'd': 7, 'e': 9, 'f': 11, 'g': 13, 'h': 15 }
-    return columnsToPosition[pos.charAt(0)]
-  },
-  /**
-   * Returns the Y value of a board position.
-   * @param String pos The board position.
-   * @return Number The Y value.
-   */
-  getYFromPosition: function (pos) {
-    return 2 * +pos.charAt(1) - 1
-  },
   move: function (pos) {
     let series = this
     let selected = series.selected
@@ -174,12 +157,13 @@ seriesType('chess', 'scatter', {
     delete this.validMoves
   },
   setPointValues: function () {
-    let series = this
-    let points = series.points
+    const series = this
+    const board = series.board
+    const points = series.points
     each(points, function (point) {
       point.shapeType = 'circle'
-      point.x = series.getXFromPosition(point.position)
-      point.y = series.getYFromPosition(point.position)
+      point.x = board.getXFromPosition(point.position)
+      point.y = board.getYFromPosition(point.position)
       point.shapeArgs = {
         x: Math.round(series.xAxis.translate(point.x, 0, 0, 0, 1)),
         y: Math.round(series.yAxis.translate(point.y, 0, 0, 0, 1))
