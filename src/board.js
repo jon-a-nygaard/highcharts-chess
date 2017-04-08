@@ -69,29 +69,23 @@ Board.prototype = {
     element.position = pos
     return element
   },
-  addClickToSquare: function (element) {
-    const board = this
-    const pos = element.position
-    element.on('click', function () {
-      board.onSquareClick(pos)
-    })
-  },
   /**
   * Draws all the rectangles for the chess board
-  * @todo: set board size in options.
+  * TODO set board size in options.
   */
   drawChessBoard: function () {
     const board = this
     let squares = board.squares
     if (!squares) {
       squares = board.squares = map(board.positions, (pos) => board.addBoardSquare(pos))
+      if (board.options.interactive) {
+        // TODO Add click event on group to improve performance.
+        each(squares, wrapper => wrapper.on('click', () => board.onSquareClick(wrapper.position)))
+      }
     }
     each(squares, function (element) {
       board.setSquareSizes(element)
       board.updateSquareFill(element)
-      if (board.options.interactive) {
-        board.addClickToSquare(element)
-      }
     })
   },
   getSquareSizeFromPosition: function (pos) {
