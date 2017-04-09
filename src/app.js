@@ -36,7 +36,7 @@ const chart = chess.chart({
 })
 const series = chart.series[0]
 updateStatus({
-  turn: series.validation.turn()
+  turn: series.game.turn()
 })
 document.getElementById('undo').onclick = () => series.undo()
 document.getElementById('redo').onclick = () => series.redo()

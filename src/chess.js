@@ -1,7 +1,7 @@
 'use strict'
 import H from 'highcharts'
-import { Chess } from 'chess.js'
 import Board from './board.js'
+import ChessGame from './chessGame.js'
 const Axis = H.Axis.prototype
 const Series = H.Series.prototype
 const scatterSeries = H.seriesTypes.scatter.prototype
@@ -55,7 +55,7 @@ seriesType('chess', 'scatter', {
     const series = this
     series.board = new Board(options.board, series, chart.renderer)
     series.board.onSquareClick = function (pos) {
-      const piece = series.validation.get({ square: pos })
+      const piece = series.game.get({ square: pos })
       const color = (piece ? piece.color : undefined)
       series.doClickAction(pos, color)
     }
@@ -63,7 +63,7 @@ seriesType('chess', 'scatter', {
       options.cursor = 'pointer'
     }
     // Initialize the game tracker
-    series.validation = new Chess()
+    series.game = new ChessGame()
     scatterSeries.init.call(series, chart, options)
   },
   doClickAction: function (pos, color) {
@@ -72,7 +72,7 @@ seriesType('chess', 'scatter', {
     const validMove = validMoves && any(validMoves, move => move.to === pos)
     if (series.selected === pos) {
       series.removeSelected()
-    } else if (series.validation.turn() === color) {
+    } else if (series.game.turn() === color) {
       series.setSelected(pos)
     } else if (validMove) {
       // Move selected to this position, if it is a valid move.
@@ -86,12 +86,12 @@ seriesType('chess', 'scatter', {
   drawChessPieces: function () {
     const series = this
     const board = series.board
-    const validation = series.validation
+    const game = series.game
     const width = series.xAxis.translate(2, 0, 0, 0, 1) - series.xAxis.translate(0, 0, 0, 0, 1)
     const height = series.yAxis.translate(2, 0, 0, 0, 1) - series.yAxis.translate(0, 0, 0, 0, 1)
     const size = width > height ? height : width
     const data = reduce(board.positions, (arr, pos) => {
-      const piece = validation.get(pos)
+      const piece = game.get(pos)
       if (piece) {
         let point = getPointData(pos, piece, size)
         if (board.options.interactive) {
@@ -112,9 +112,9 @@ seriesType('chess', 'scatter', {
   move: function (pos) {
     const series = this
     const selected = series.selected
-    const validation = series.validation
+    const game = series.game
     if (selected) {
-      const moved = validation.move({
+      const moved = game.move({
         from: series.selected,
         to: pos,
         promotion: 'q'
@@ -128,7 +128,7 @@ seriesType('chess', 'scatter', {
   },
   moveStack: [],
   onMove: function (move) {
-    const v = this.validation
+    const v = this.game
     if (this.options.onMove) {
       this.options.onMove({
         turn: v.turn(),
@@ -158,7 +158,7 @@ seriesType('chess', 'scatter', {
   },
   setSelected: function (pos) {
     this.selected = pos
-    this.validMoves = this.validation.moves({
+    this.validMoves = this.game.moves({
       square: this.selected,
       verbose: true
     })
@@ -173,7 +173,7 @@ seriesType('chess', 'scatter', {
     Series.translate.call(this) // Call again to set correct point values
   },
   undo: function () {
-    let move = this.validation.undo()
+    let move = this.game.undo()
     if (move !== null) {
       this.onMove(move)
       this.isDirty = true
@@ -186,7 +186,7 @@ seriesType('chess', 'scatter', {
   },
   redo: function () {
     let move = (this.moveStack.length) ? this.moveStack.pop() : false
-    let moved = this.validation.move({
+    let moved = this.game.move({
       from: move.from,
       to: move.to,
       promotion: move.promotion
