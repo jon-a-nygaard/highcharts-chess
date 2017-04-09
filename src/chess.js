@@ -17,7 +17,17 @@ const seriesType = H.seriesType
  * @returns {Bool} True if any item in the collection matches the predicate.
  */
 const any = (arr, predicate) => arr.some(predicate)
-
+const reduce = (arr, fn, initial) => arr.reduce(fn, initial)
+const getPointData = (pos, obj, size) => ({
+  color: obj.color,
+  marker: {
+    height: size,
+    symbol: 'url(icons/' + obj.color + '_' + obj.type + '.png)',
+    width: size
+  },
+  position: pos,
+  type: obj.type
+})
 /**
  * Override the Highcharts axis to always be square.
  * @todo  Instead of overriding, compose the SquareAxis from the default Axis.
@@ -45,49 +55,21 @@ seriesType('chess', 'scatter', {
     const series = this
     series.board = new Board(options.board, series, chart.renderer)
     series.board.onSquareClick = function (pos) {
-      let piece = series.validation.get({ square: pos })
-      let color = (piece ? piece.color : undefined)
+      const piece = series.validation.get({ square: pos })
+      const color = (piece ? piece.color : undefined)
       series.doClickAction(pos, color)
+    }
+    if (series.board.options.interactive) {
+      options.cursor = 'pointer'
     }
     // Initialize the game tracker
     series.validation = new Chess()
     scatterSeries.init.call(series, chart, options)
   },
-  /**
-   * Creates a single rectangle, representing one board square, and returns the created element.
-   * @param {String} The position of the square.
-   * @return {Element} Returns a Highcharts Element.
-   */
-  addClickToPiece: function (piece) {
-    let series = this
-    if (!piece.events) {
-      piece.events = {}
-    }
-    piece.events.click = function () {
-      series.doClickAction(this.position, this.color)
-    }
-  },
-
-  addPiece: function (pos, obj, size) {
-    let piece = {
-      color: obj.color,
-      marker: {
-        height: size,
-        symbol: 'url(icons/' + obj.color + '_' + obj.type + '.png)',
-        width: size
-      },
-      position: pos,
-      type: obj.type
-    }
-    return piece
-  },
   doClickAction: function (pos, color) {
-    let series = this
-    let validMove
-    let validMoves = series.validMoves
-    validMove = validMoves && any(validMoves, function (move) {
-      return move.to === pos
-    })
+    const series = this
+    const validMoves = series.validMoves
+    const validMove = validMoves && any(validMoves, move => move.to === pos)
     if (series.selected === pos) {
       series.removeSelected()
     } else if (series.validation.turn() === color) {
@@ -104,33 +86,35 @@ seriesType('chess', 'scatter', {
   drawChessPieces: function () {
     const series = this
     const board = series.board
-    let validation = series.validation
-    let width = series.xAxis.translate(2, 0, 0, 0, 1) - series.xAxis.translate(0, 0, 0, 0, 1)
-    let height = series.yAxis.translate(2, 0, 0, 0, 1) - series.yAxis.translate(0, 0, 0, 0, 1)
-    let size = width > height ? height : width
-    let data = []
-    let point
-    let piece
-    each(board.positions, function (pos) {
-      piece = validation.get(pos)
+    const validation = series.validation
+    const width = series.xAxis.translate(2, 0, 0, 0, 1) - series.xAxis.translate(0, 0, 0, 0, 1)
+    const height = series.yAxis.translate(2, 0, 0, 0, 1) - series.yAxis.translate(0, 0, 0, 0, 1)
+    const size = width > height ? height : width
+    const data = reduce(board.positions, (arr, pos) => {
+      const piece = validation.get(pos)
       if (piece) {
-        point = series.addPiece(pos, piece, size)
-        data.push(point)
+        let point = getPointData(pos, piece, size)
         if (board.options.interactive) {
-          series.addClickToPiece(point)
+          if (!point.events) {
+            point.events = {}
+          }
+          point.events.click = function () {
+            series.doClickAction(this.position, this.color)
+          }
         }
+        arr.push(point)
       }
-    })
-    // @todo Find a way to set data, before Series.processData is called.
+      return arr
+    }, [])
+    // TODO Find a way to set data, before Series.processData is called.
     series.setData(data, false)
   },
   move: function (pos) {
-    let series = this
-    let selected = series.selected
-    let validation = series.validation
-    let moved
+    const series = this
+    const selected = series.selected
+    const validation = series.validation
     if (selected) {
-      moved = validation.move({
+      const moved = validation.move({
         from: series.selected,
         to: pos,
         promotion: 'q'
@@ -153,8 +137,8 @@ seriesType('chess', 'scatter', {
     }
   },
   removeSelected: function () {
-    delete this.selected
-    delete this.validMoves
+    this.selected = null
+    this.validMoves = []
   },
   setPointValues: function () {
     const series = this
@@ -179,11 +163,7 @@ seriesType('chess', 'scatter', {
       verbose: true
     })
   },
-
   translate: function () {
-    if (this.board.options.interactive) {
-      this.options.cursor = 'pointer'
-    }
     this.board.render()
     this.drawChessPieces()
     // Call original translate to generate points, so we can work with them.
@@ -222,7 +202,7 @@ seriesType('chess', 'scatter', {
     return move
   },
   bindAxes: function () {
-    let chessAxis = {
+    const chessAxis = {
       endOnTick: false,
       gridLineWidth: 0,
       lineWidth: 0,
