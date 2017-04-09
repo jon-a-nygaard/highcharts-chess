@@ -146,7 +146,7 @@ Board.prototype = {
     })
   },
   setSquareSizes: function (element) {
-    let size = this.getSquareSizeFromPosition(element.position)
+    const size = this.getSquareSizeFromPosition(element.position)
     element.animate(size)
   },
   /**
