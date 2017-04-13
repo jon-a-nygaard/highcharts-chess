@@ -1,0 +1,26 @@
+/**
+* Colors
+* https://www.design-seeds.com/wp-content/uploads/2017/04/4_12_ColorView_liz.png
+* #D9DDE7
+* #A9C8D2
+* #87AFC1
+* #5785A3
+* #37433D
+* #B4AB48
+*/
+body {
+  color: #000;
+}
+.navbar {
+  margin-bottom: 0;
+}
+.navbar-default .navbar-brand {
+  color: #5785a3;
+}
+h1 {
+  color: #5785a3;
+}
+.jumbotron {
+  background-color: #5785a3;
+  color: #fff;
+}
