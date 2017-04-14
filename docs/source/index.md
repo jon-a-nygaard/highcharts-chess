@@ -7,4 +7,5 @@ subtitle: A simple plugin for Chess and Highcharts lovers
 Not much of an introduction so far, but we'll get there.
 
 # Examples
-Add some cool stuff.
+- [Simple 2 Player Game](/highcharts-chess/examples-simple)
+- [AI Playing Random Moves](/highcharts-chess/examples-random-ai)
