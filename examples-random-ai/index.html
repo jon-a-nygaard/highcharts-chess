@@ -2,7 +2,7 @@
 <html>
 <head>
     <meta charset="utf-8">
-    <!-- Use Highcharts Chess for dynamic title -->
+    <!-- Use AI Playing Random Moves for dynamic title -->
     <title>Highcharts Chess</title>
 
     <!-- Latest compiled and minified CSS -->
@@ -39,20 +39,24 @@
   </div>
 </nav>
 
-  <div class="jumbotron">
   <div class="container">
-    <div class="row text-center">
-        <h1>Highcharts Chess</h1>
-        <p>A simple plugin for Chess and Highcharts lovers</p>
-    </div>
+  <h1>AI Playing Random Moves</h1>
+  
+<div class="row">
+  <div class="col-xs-6">
+    <div id="chart"></div>
+  </div>
+  <div class="col-xs-6">
+    <ul class="list-group">
+      <li class="list-group-item">Status: <span id="turn"></span></li>
+      <li class="list-group-item">Last move: <span id="move"></span></li>
+    </ul>
+    <button class="btn btn-md btn-default" id="undo"><span class="glyphicon glyphicon-arrow-left" aria-hidden="true"></span> Undo</button>
+    <button class="btn btn-md btn-default" id="redo"><span class="glyphicon glyphicon-arrow-right" aria-hidden="true"></span> Redo</button>
   </div>
 </div>
-<div class="container">
-  <h1 id="Introduction"><a href="#Introduction" class="headerlink" title="Introduction"></a>Introduction</h1><p>Not much of an introduction so far, but we’ll get there.</p>
-<h1 id="Examples"><a href="#Examples" class="headerlink" title="Examples"></a>Examples</h1><ul>
-<li><a href="/highcharts-chess/examples-simple">Simple 2 Player Game</a></li>
-<li><a href="/highcharts-chess/examples-random-ai">AI Playing Random Moves</a></li>
-</ul>
+<script type="text/javascript" src="/highcharts-chess/assets/random-ai.js"></script>
+
 
 </div>
   <!-- Latest compiled and minified JavaScript -->
