@@ -3,6 +3,7 @@ layout: example
 title: AI playing random moves
 date: 2017-04-13 23:35:37
 ---
+{% raw %}
 <div class="row">
   <div class="col-xs-6">
     <div id="chart"></div>
@@ -17,3 +18,5 @@ date: 2017-04-13 23:35:37
   </div>
 </div>
 <script type="text/javascript" src="/highcharts-chess/assets/random-ai.js"></script>
+{% endraw %}
+
