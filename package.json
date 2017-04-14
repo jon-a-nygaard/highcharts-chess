@@ -6,8 +6,8 @@
   "scripts": {
     "test": "eslint src/app.js",
     "build": "npm run build:random-ai && npm run build:simple",
-    "build:random-ai": "browserify src/random-ai.js -t babelify > docs/source/js/random-ai.js",
-    "build:simple": "browserify src/simple.js -t babelify > docs/source/js/simple.js",
+    "build:random-ai": "browserify src/random-ai.js -t babelify > docs/source/assets/random-ai.js",
+    "build:simple": "browserify src/simple.js -t babelify > docs/source/assets/simple.js",
     "watch:build": "watch \"npm run build\" src/"
   },
   "repository": {

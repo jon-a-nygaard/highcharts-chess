@@ -25,7 +25,7 @@ const chart = chess.chart({
       moves: '#DF625F',
       interactive: true
     },
-    icons: '/highcharts-chess/images/icons',
+    icons: '/highcharts-chess/assets/icons',
     onMove: updateStatus
   }],
   title: {
