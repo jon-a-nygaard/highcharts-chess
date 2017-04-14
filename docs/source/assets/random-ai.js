@@ -2474,20 +2474,18 @@ var updateStatus = function updateStatus(status) {
   }
 };
 // TODO Add own chess constructor to Highchart. Highcharts.chess
-var chart = _chess2.default.chart({
+var chart = _chess2.default.chart('chart', {
   chart: {
-    animation: false,
-    renderTo: 'chart',
-    backgroundColor: '#455A64'
+    animation: false
   },
   series: [{
     type: 'chess',
     board: {
       // Palette: http://paletton.com/#uid=101050kp5mHv9gRrOjYlRp9ios2
-      dark: '#9F1815',
-      light: '#B52B27',
-      selected: '#860704',
-      moves: '#DF625F',
+      dark: '#5785A3',
+      light: '#D9DDE7',
+      selected: '#87AFC1',
+      moves: '#87AFC1',
       interactive: true
     },
     icons: '/highcharts-chess/assets/icons',
