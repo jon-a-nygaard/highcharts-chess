@@ -18,11 +18,11 @@ const seriesType = H.seriesType
  */
 const any = (arr, predicate) => arr.some(predicate)
 const reduce = (arr, fn, initial) => arr.reduce(fn, initial)
-const getPointData = (pos, obj, size) => ({
+const getPointData = (pos, obj, size, icons) => ({
   color: obj.color,
   marker: {
     height: size,
-    symbol: 'url(icons/' + obj.color + '_' + obj.type + '.png)',
+    symbol: 'url(' + icons + '/' + obj.color + '_' + obj.type + '.png)',
     width: size
   },
   position: pos,
@@ -85,6 +85,7 @@ seriesType('chess', 'scatter', {
   },
   drawChessPieces: function () {
     const series = this
+    const options = series.options
     const board = series.board
     const game = series.game
     const width = series.xAxis.translate(2, 0, 0, 0, 1) - series.xAxis.translate(0, 0, 0, 0, 1)
@@ -93,7 +94,7 @@ seriesType('chess', 'scatter', {
     const data = reduce(board.positions, (arr, pos) => {
       const piece = game.get(pos)
       if (piece) {
-        let point = getPointData(pos, piece, size)
+        let point = getPointData(pos, piece, size, options.icons)
         if (board.options.interactive) {
           if (!point.events) {
             point.events = {}
